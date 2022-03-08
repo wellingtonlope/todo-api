@@ -2,7 +2,7 @@ test:
 	go test ./...
 
 server:
-	go run ./framework/rest/server.go
+	go run ./cmd/http/server.go
 
 build:
-	go build ./framework/rest/server.go
+	go build ./cmd/http/server.go

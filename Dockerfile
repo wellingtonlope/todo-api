@@ -2,7 +2,7 @@ FROM golang:1.17.4-alpine AS builder
 RUN mkdir /build
 ADD . /build/
 WORKDIR /build
-RUN go build ./framework/rest/server.go
+RUN go build ./cmd/http/server.go
 
 FROM alpine
 RUN adduser -S -D -H -h /app appuser
