@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"errors"
 
 	"github.com/wellingtonlope/todo-api/internal/domain"
@@ -11,10 +12,10 @@ var (
 	ErrTodoAlreadyExists = errors.New("todo already exists")
 )
 
-type TodoRepository interface {
-	GetAll() (*[]domain.Todo, error)
-	GetByID(id string) (*domain.Todo, error)
-	Insert(todo domain.Todo) (*domain.Todo, error)
-	Update(todo domain.Todo) (*domain.Todo, error)
-	DeleteByID(id string) error
+type Todo interface {
+	GetAll(ctx context.Context) ([]domain.Todo, error)
+	GetByID(ctx context.Context, id string) (domain.Todo, error)
+	Create(ctx context.Context, todo domain.Todo) (domain.Todo, error)
+	Update(ctx context.Context, todo domain.Todo) error
+	DeleteByID(ctx context.Context, id string) error
 }

@@ -2,49 +2,44 @@ package domain
 
 import (
 	"errors"
+	"fmt"
 	"time"
 )
 
-var (
-	ErrTitleRequired = errors.New("title is required")
-)
+var ErrTodoInvalidInput = errors.New("todo invalid input")
 
 type Todo struct {
 	ID          string
 	Title       string
 	Description string
-	CreatedDate *time.Time
-	UpdatedDate *time.Time
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
-func NewTodo(title, description string, createdDate *time.Time) (*Todo, error) {
+func NewTodo(title, description string, date time.Time) (Todo, error) {
 	if title == "" {
-		return nil, ErrTitleRequired
+		return Todo{}, fmt.Errorf("%w: title", ErrTodoInvalidInput)
 	}
-	if createdDate == nil {
-		today := time.Now()
-		createdDate = &today
+	if date.IsZero() {
+		return Todo{}, fmt.Errorf("%w: date", ErrTodoInvalidInput)
 	}
-
-	return &Todo{
+	return Todo{
 		Title:       title,
 		Description: description,
-		CreatedDate: createdDate,
+		CreatedAt:   date,
+		UpdatedAt:   date,
 	}, nil
 }
 
-func (todo *Todo) Update(title, description string, updatedDate *time.Time) error {
+func (t Todo) Update(title, description string, date time.Time) (Todo, error) {
 	if title == "" {
-		return ErrTitleRequired
+		return Todo{}, fmt.Errorf("%w: title", ErrTodoInvalidInput)
 	}
-	if updatedDate == nil {
-		today := time.Now()
-		updatedDate = &today
+	if date.IsZero() {
+		return Todo{}, fmt.Errorf("%w: date", ErrTodoInvalidInput)
 	}
-
-	todo.Title = title
-	todo.Description = description
-	todo.UpdatedDate = updatedDate
-
-	return nil
+	t.Title = title
+	t.Description = description
+	t.UpdatedAt = date
+	return t, nil
 }

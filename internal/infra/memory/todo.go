@@ -6,34 +6,38 @@ import (
 	"github.com/wellingtonlope/todo-api/internal/domain"
 )
 
+func NewTodoRepository() *TodoRepository {
+	return &TodoRepository{}
+}
+
 type TodoRepository struct {
 	todos []domain.Todo
 }
 
-func (r *TodoRepository) GetAll() (*[]domain.Todo, error) {
-	return &r.todos, nil
+func (r *TodoRepository) GetAll() ([]domain.Todo, error) {
+	return r.todos, nil
 }
 
-func (r *TodoRepository) Insert(todo domain.Todo) (*domain.Todo, error) {
+func (r *TodoRepository) Insert(todo domain.Todo) (domain.Todo, error) {
 	todo.ID = uuid.New().String()
 
 	r.todos = append(r.todos, todo)
-	return &todo, nil
+	return todo, nil
 }
 
-func (r *TodoRepository) GetByID(id string) (*domain.Todo, error) {
+func (r *TodoRepository) GetByID(id string) (domain.Todo, error) {
 	for _, todo := range r.todos {
 		if todo.ID == id {
-			return &todo, nil
+			return todo, nil
 		}
 	}
-	return nil, repository.ErrTodoNotFound
+	return domain.Todo{}, repository.ErrTodoNotFound
 }
 
-func (r *TodoRepository) Update(todo domain.Todo) (*domain.Todo, error) {
+func (r *TodoRepository) Update(todo domain.Todo) error {
 	_, err := r.GetByID(todo.ID)
 	if err != nil {
-		return nil, repository.ErrTodoNotFound
+		return repository.ErrTodoNotFound
 	}
 
 	for index, item := range r.todos {
@@ -43,7 +47,7 @@ func (r *TodoRepository) Update(todo domain.Todo) (*domain.Todo, error) {
 		}
 	}
 
-	return &todo, nil
+	return nil
 }
 
 func (r *TodoRepository) DeleteByID(id string) error {

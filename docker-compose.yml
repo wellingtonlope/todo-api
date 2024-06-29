@@ -1,27 +1,13 @@
-version: '3'
+version: "3.8"
 
 services:
   todo-api:
     container_name: todo-api
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     environment:
       - APP_ENV=production
-      - MONGO_URI=mongodb://todo-db:27017
-      - MONGO_DATABASE=todo-api
       - PORT=1323
     ports:
       - "1323:1323"
-    depends_on:
-      - todo-db
-    networks:
-      - todo-network
-  todo-db:
-    container_name: todo-db
-    image: mongo:latest
-    networks:
-      - todo-network
-networks:
-  todo-network:
-    driver: bridge

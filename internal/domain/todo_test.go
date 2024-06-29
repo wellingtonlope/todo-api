@@ -1,68 +1,127 @@
-package domain
+package domain_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/wellingtonlope/todo-api/internal/domain"
 )
 
 func TestNewTodo(t *testing.T) {
-	t.Run("should create a todo", func(t *testing.T) {
-		expectedTitle := "title"
-		expectedDescription := "description"
-		expectedCreatedDate := time.Now()
-
-		todo, err := NewTodo(expectedTitle, expectedDescription, &expectedCreatedDate)
-
-		assert.Nil(t, err)
-		assert.NotNil(t, todo)
-		assert.Equal(t, expectedTitle, todo.Title)
-		assert.Equal(t, expectedDescription, todo.Description)
-		assert.Equal(t, expectedCreatedDate, *todo.CreatedDate)
-	})
-
-	t.Run("shouln't create a todo", func(t *testing.T) {
-		expectedTitle := ""
-		expectedDescription := ""
-		expectedCreatedDate := time.Now()
-
-		todo, err := NewTodo(expectedTitle, expectedDescription, &expectedCreatedDate)
-
-		assert.Nil(t, todo)
-		assert.NotNil(t, err)
-		assert.Equal(t, ErrTitleRequired.Error(), err.Error())
-	})
+	exampleTitle := "title example"
+	exampleDescription := "description example"
+	exampleDate, _ := time.Parse(time.DateOnly, "2024-01-01")
+	exampleTodo := domain.Todo{
+		Title:       exampleTitle,
+		Description: exampleDescription,
+		CreatedAt:   exampleDate,
+		UpdatedAt:   exampleDate,
+	}
+	testCases := []struct {
+		name        string
+		title       string
+		description string
+		date        time.Time
+		result      domain.Todo
+		err         error
+	}{
+		{
+			name:        "should fail when title is invalid",
+			title:       "",
+			description: exampleDescription,
+			date:        exampleDate,
+			result:      domain.Todo{},
+			err:         fmt.Errorf("%w: title", domain.ErrTodoInvalidInput),
+		},
+		{
+			name:        "should fail when date is invalid",
+			title:       exampleTitle,
+			description: exampleDescription,
+			date:        time.Time{},
+			result:      domain.Todo{},
+			err:         fmt.Errorf("%w: date", domain.ErrTodoInvalidInput),
+		},
+		{
+			name:        "should create todo",
+			title:       exampleTitle,
+			description: exampleDescription,
+			date:        exampleDate,
+			result:      exampleTodo,
+			err:         nil,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result, err := domain.NewTodo(tc.title, tc.description, tc.date)
+			assert.Equal(t, tc.result, result)
+			assert.Equal(t, tc.err, err)
+		})
+	}
 }
 
-func TestUpdate(t *testing.T) {
-	t.Run("should update a todo", func(t *testing.T) {
-		expectedTitle := "title"
-		expectedDescription := "description"
-		expectedCreatedDate := time.Now()
-		expectedUpdatedDate := time.Now()
-
-		todo, _ := NewTodo(expectedTitle, expectedDescription, &expectedCreatedDate)
-		err := todo.Update(expectedTitle, expectedDescription, &expectedUpdatedDate)
-
-		assert.Nil(t, err)
-		assert.Equal(t, expectedTitle, todo.Title)
-		assert.Equal(t, expectedDescription, todo.Description)
-		assert.Equal(t, expectedCreatedDate, *todo.CreatedDate)
-		assert.Equal(t, expectedUpdatedDate, *todo.UpdatedDate)
-	})
-
-	t.Run("shouldn't update a todo", func(t *testing.T) {
-		expectedTitle := ""
-		expectedDescription := ""
-		expectedCreatedDate := time.Now()
-		expectedUpdatedDate := time.Now()
-
-		todo, _ := NewTodo(expectedTitle, expectedDescription, &expectedCreatedDate)
-		err := todo.Update(expectedTitle, expectedDescription, &expectedUpdatedDate)
-
-		assert.Nil(t, todo)
-		assert.NotNil(t, err)
-		assert.Equal(t, ErrTitleRequired.Error(), err.Error())
-	})
+func TestTodo_Update(t *testing.T) {
+	exampleTitle := "title example"
+	exampleTitleUpdated := "title example updated"
+	exampleDescription := "description example"
+	exampleDescriptionUpdated := "description example updated"
+	exampleDate, _ := time.Parse(time.DateOnly, "2024-01-01")
+	exampleDateUpdated, _ := time.Parse(time.DateOnly, "2024-01-02")
+	exampleTodo := domain.Todo{
+		Title:       exampleTitle,
+		Description: exampleDescription,
+		CreatedAt:   exampleDate,
+		UpdatedAt:   exampleDate,
+	}
+	exampleTodoUpdated := domain.Todo{
+		Title:       exampleTitleUpdated,
+		Description: exampleDescriptionUpdated,
+		CreatedAt:   exampleDate,
+		UpdatedAt:   exampleDateUpdated,
+	}
+	testCases := []struct {
+		name        string
+		title       string
+		description string
+		date        time.Time
+		todo        domain.Todo
+		result      domain.Todo
+		err         error
+	}{
+		{
+			name:        "should fail when title is invalid",
+			title:       "",
+			description: exampleDescriptionUpdated,
+			date:        exampleDateUpdated,
+			todo:        exampleTodo,
+			result:      domain.Todo{},
+			err:         fmt.Errorf("%w: title", domain.ErrTodoInvalidInput),
+		},
+		{
+			name:        "should fail when date is invalid",
+			title:       exampleTitleUpdated,
+			description: exampleDescriptionUpdated,
+			date:        time.Time{},
+			todo:        exampleTodo,
+			result:      domain.Todo{},
+			err:         fmt.Errorf("%w: date", domain.ErrTodoInvalidInput),
+		},
+		{
+			name:        "should update todo",
+			title:       exampleTitleUpdated,
+			description: exampleDescriptionUpdated,
+			date:        exampleDateUpdated,
+			todo:        exampleTodo,
+			result:      exampleTodoUpdated,
+			err:         nil,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result, err := tc.todo.Update(tc.title, tc.description, tc.date)
+			assert.Equal(t, tc.result, result)
+			assert.Equal(t, tc.err, err)
+		})
+	}
 }

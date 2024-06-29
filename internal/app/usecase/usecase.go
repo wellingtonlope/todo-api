@@ -1,33 +1,31 @@
 package usecase
 
-import (
-	"github.com/wellingtonlope/todo-api/internal/app/repository"
-	"github.com/wellingtonlope/todo-api/internal/app/usecase/todo"
+type (
+	ErrorType string
+	Error     struct {
+		Message string
+		Cause   error
+		Type    ErrorType
+	}
 )
 
-type UseCase interface {
-	Handle(input interface{}) (output *interface{}, err error)
-}
+var (
+	ErrorTypeBadRequest    = ErrorType("bad_request")
+	ErrorTypeInternalError = ErrorType("internal_error")
+	ErrorTypeNotFound      = ErrorType("not_found")
+)
 
-type AllUseCases struct {
-	InsertTodo     *todo.Insert
-	UpdateTodo     *todo.Update
-	DeleteTodoById *todo.DeleteById
-	GetAllTodos    *todo.GetAll
-	GetTodoById    *todo.GetById
-}
-
-func GetUseCases(repositories repository.Repositories) (*AllUseCases, error) {
-	repos, err := repositories.GetRepositories()
-	if err != nil {
-		return nil, err
+func NewError(message string, cause error, errorType ErrorType) Error {
+	return Error{
+		Message: message,
+		Cause:   cause,
+		Type:    errorType,
 	}
+}
 
-	return &AllUseCases{
-		InsertTodo:     todo.NewInsert(repos.TodoRepository),
-		UpdateTodo:     todo.NewUpdate(repos.TodoRepository),
-		DeleteTodoById: todo.NewDeleteById(repos.TodoRepository),
-		GetAllTodos:    todo.NewGetAll(repos.TodoRepository),
-		GetTodoById:    todo.NewGetById(repos.TodoRepository),
-	}, nil
+func (e Error) Error() string {
+	if e.Cause == nil {
+		return e.Message
+	}
+	return e.Cause.Error()
 }
