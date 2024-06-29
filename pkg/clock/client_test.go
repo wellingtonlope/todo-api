@@ -20,7 +20,7 @@ func TestClient_Now(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			c := clock.NewClient()
+			c := clock.NewClientUTC()
 			result := c.Now()
 			assert.Equal(t, tc.result.Format(time.DateTime), result.Format(time.DateTime))
 		})

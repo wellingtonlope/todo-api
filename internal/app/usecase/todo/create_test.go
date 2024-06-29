@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/wellingtonlope/todo-api/internal/app/repository"
+	"github.com/stretchr/testify/mock"
 	"github.com/wellingtonlope/todo-api/internal/app/usecase"
 	"github.com/wellingtonlope/todo-api/internal/app/usecase/todo"
 	"github.com/wellingtonlope/todo-api/internal/domain"
@@ -17,17 +17,17 @@ import (
 func TestCreate_Handle(t *testing.T) {
 	exampleDate, _ := time.Parse(time.DateOnly, "2024-01-01")
 	testCases := []struct {
-		name       string
-		repository *repository.TodoMock
-		clock      *clock.ClientMock
-		ctx        context.Context
-		input      todo.CreateInput
-		result     todo.CreateOutput
-		err        error
+		name        string
+		createStore *createStoreMock
+		clock       *clock.ClientMock
+		ctx         context.Context
+		input       todo.CreateInput
+		result      todo.CreateOutput
+		err         error
 	}{
 		{
-			name:       "should fail when input is invalid",
-			repository: repository.NewTodoMock(),
+			name:        "should fail when input is invalid",
+			createStore: new(createStoreMock),
 			clock: func() *clock.ClientMock {
 				m := clock.NewClientMock()
 				m.On("Now").Return(exampleDate).Once()
@@ -44,8 +44,8 @@ func TestCreate_Handle(t *testing.T) {
 		},
 		{
 			name: "should fail when repository fails",
-			repository: func() *repository.TodoMock {
-				m := repository.NewTodoMock()
+			createStore: func() *createStoreMock {
+				m := new(createStoreMock)
 				m.On("Create", context.TODO(), domain.Todo{
 					Title:       "example title",
 					Description: "example description",
@@ -70,8 +70,8 @@ func TestCreate_Handle(t *testing.T) {
 		},
 		{
 			name: "should create a todo",
-			repository: func() *repository.TodoMock {
-				m := repository.NewTodoMock()
+			createStore: func() *createStoreMock {
+				m := new(createStoreMock)
 				m.On("Create", context.TODO(), domain.Todo{
 					Title:       "example title",
 					Description: "example description",
@@ -108,10 +108,21 @@ func TestCreate_Handle(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			uc := todo.NewCreate(tc.repository, tc.clock)
+			uc := todo.NewCreate(tc.createStore, tc.clock)
 			result, err := uc.Handle(tc.ctx, tc.input)
 			assert.Equal(t, tc.result, result)
 			assert.Equal(t, tc.err, err)
+			tc.createStore.AssertExpectations(t)
+			tc.clock.AssertExpectations(t)
 		})
 	}
+}
+
+type createStoreMock struct {
+	mock.Mock
+}
+
+func (m *createStoreMock) Create(ctx context.Context, todo domain.Todo) (domain.Todo, error) {
+	args := m.Called(ctx, todo)
+	return args.Get(0).(domain.Todo), args.Error(1)
 }

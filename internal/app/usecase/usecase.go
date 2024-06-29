@@ -1,5 +1,7 @@
 package usecase
 
+import "errors"
+
 type (
 	ErrorType string
 	Error     struct {
@@ -13,6 +15,8 @@ var (
 	ErrorTypeBadRequest    = ErrorType("bad_request")
 	ErrorTypeInternalError = ErrorType("internal_error")
 	ErrorTypeNotFound      = ErrorType("not_found")
+
+	AnError = NewError("an error", errors.New("an error"), ErrorTypeInternalError)
 )
 
 func NewError(message string, cause error, errorType ErrorType) Error {

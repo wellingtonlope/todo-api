@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/wellingtonlope/todo-api/internal/app/repository"
 	"github.com/wellingtonlope/todo-api/internal/app/usecase"
 	"github.com/wellingtonlope/todo-api/internal/domain"
 	"github.com/wellingtonlope/todo-api/pkg/clock"
@@ -22,19 +21,22 @@ type (
 		CreatedAt   time.Time
 		UpdatedAt   time.Time
 	}
+	CreateStore interface {
+		Create(ctx context.Context, todo domain.Todo) (domain.Todo, error)
+	}
 	Create interface {
 		Handle(context.Context, CreateInput) (CreateOutput, error)
 	}
 	create struct {
-		repository repository.Todo
-		clock      clock.Client
+		store CreateStore
+		clock clock.Client
 	}
 )
 
-func NewCreate(repository repository.Todo, clock clock.Client) *create {
+func NewCreate(store CreateStore, clock clock.Client) *create {
 	return &create{
-		repository: repository,
-		clock:      clock,
+		store: store,
+		clock: clock,
 	}
 }
 
@@ -43,7 +45,7 @@ func (uc *create) Handle(ctx context.Context, input CreateInput) (CreateOutput, 
 	if err != nil {
 		return CreateOutput{}, usecase.NewError(err.Error(), err, usecase.ErrorTypeBadRequest)
 	}
-	todo, err = uc.repository.Create(ctx, todo)
+	todo, err = uc.store.Create(ctx, todo)
 	if err != nil {
 		return CreateOutput{}, usecase.NewError("fail to create a todo in the repository", err,
 			usecase.ErrorTypeInternalError)
