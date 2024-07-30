@@ -29,3 +29,8 @@ func (r *todo) GetByID(_ context.Context, id string) (domain.Todo, error) {
 	}
 	return domain.Todo{}, todoUC.ErrGetByIDStoreNotFound
 }
+
+func (r *todo) DeleteByID(_ context.Context, id string) error {
+	delete(r.todos, id)
+	return nil
+}
