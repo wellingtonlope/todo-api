@@ -42,3 +42,11 @@ func (r *todo) DeleteByID(_ context.Context, id string) error {
 	delete(r.todos, id)
 	return nil
 }
+
+func (r *todo) Update(_ context.Context, todo domain.Todo) error {
+	if _, ok := r.todos[todo.ID]; ok {
+		r.todos[todo.ID] = todo
+		return nil
+	}
+	return todoUC.ErrUpdateStoreNotFound
+}
