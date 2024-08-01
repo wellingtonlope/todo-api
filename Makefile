@@ -1,8 +1,8 @@
 test:
-	go test ./...
+	go test ./... -count=1
 
 server:
-	go run ./cmd/http/server.go
+	go run ./cmd/api/
 
 build:
-	go build ./cmd/http/server.go
+	go build ./cmd/api/
