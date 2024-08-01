@@ -59,12 +59,17 @@ func main() {
 			fx.Annotate(
 				memory.NewTodoRepository,
 				fx.As(new(todo.CreateStore)),
+				fx.As(new(todo.GetAllStore)),
 				fx.As(new(todo.GetByIDStore)),
 				fx.As(new(todo.DeleteByIDStore)),
 			),
 			fx.Annotate(
 				todo.NewCreate,
 				fx.As(new(todo.Create)),
+			),
+			fx.Annotate(
+				todo.NewGetAll,
+				fx.As(new(todo.GetAll)),
 			),
 			fx.Annotate(
 				todo.NewGetByID,
@@ -76,6 +81,11 @@ func main() {
 			),
 			fx.Annotate(
 				handler.NewTodoCreate,
+				fx.As(new(handler.Handler)),
+				fx.ResultTags(`group:"handlers"`),
+			),
+			fx.Annotate(
+				handler.NewTodoGetAll,
 				fx.As(new(handler.Handler)),
 				fx.ResultTags(`group:"handlers"`),
 			),

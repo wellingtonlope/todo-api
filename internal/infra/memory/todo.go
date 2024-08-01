@@ -23,6 +23,14 @@ func (r *todo) Create(_ context.Context, todo domain.Todo) (domain.Todo, error) 
 	return todo, nil
 }
 
+func (r *todo) GetAll(_ context.Context) ([]domain.Todo, error) {
+	todos := make([]domain.Todo, 0, len(r.todos))
+	for _, item := range r.todos {
+		todos = append(todos, item)
+	}
+	return todos, nil
+}
+
 func (r *todo) GetByID(_ context.Context, id string) (domain.Todo, error) {
 	if item, ok := r.todos[id]; ok {
 		return item, nil
