@@ -8,7 +8,7 @@ import (
 	"github.com/wellingtonlope/todo-api/pkg/clock"
 )
 
-func TestClient_Now(t *testing.T) {
+func TestClientUTC_Now(t *testing.T) {
 	testCases := []struct {
 		name   string
 		result time.Time
