@@ -1,6 +1,13 @@
 package usecase
 
-import "errors"
+import (
+	"errors"
+	"time"
+)
+
+type Clock interface {
+	Now() time.Time
+}
 
 type (
 	ErrorType string

@@ -11,7 +11,6 @@ import (
 	"github.com/wellingtonlope/todo-api/internal/app/usecase"
 	"github.com/wellingtonlope/todo-api/internal/app/usecase/todo"
 	"github.com/wellingtonlope/todo-api/internal/domain"
-	"github.com/wellingtonlope/todo-api/pkg/clock"
 )
 
 func TestCreate_Handle(t *testing.T) {
@@ -19,7 +18,7 @@ func TestCreate_Handle(t *testing.T) {
 	testCases := []struct {
 		name        string
 		createStore *createStoreMock
-		clock       *clock.ClientMock
+		clock       *usecase.ClockMock
 		ctx         context.Context
 		input       todo.CreateInput
 		result      todo.CreateOutput
@@ -28,8 +27,8 @@ func TestCreate_Handle(t *testing.T) {
 		{
 			name:        "should fail when input is invalid",
 			createStore: new(createStoreMock),
-			clock: func() *clock.ClientMock {
-				m := clock.NewClientMock()
+			clock: func() *usecase.ClockMock {
+				m := usecase.NewClockMock()
 				m.On("Now").Return(exampleDate).Once()
 				return m
 			}(),
@@ -54,8 +53,8 @@ func TestCreate_Handle(t *testing.T) {
 				}).Return(domain.Todo{}, assert.AnError).Once()
 				return m
 			}(),
-			clock: func() *clock.ClientMock {
-				m := clock.NewClientMock()
+			clock: func() *usecase.ClockMock {
+				m := usecase.NewClockMock()
 				m.On("Now").Return(exampleDate).Once()
 				return m
 			}(),
@@ -86,8 +85,8 @@ func TestCreate_Handle(t *testing.T) {
 				}, nil).Once()
 				return m
 			}(),
-			clock: func() *clock.ClientMock {
-				m := clock.NewClientMock()
+			clock: func() *usecase.ClockMock {
+				m := usecase.NewClockMock()
 				m.On("Now").Return(exampleDate).Once()
 				return m
 			}(),

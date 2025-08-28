@@ -11,7 +11,6 @@ import (
 	"github.com/wellingtonlope/todo-api/internal/app/usecase"
 	"github.com/wellingtonlope/todo-api/internal/app/usecase/todo"
 	"github.com/wellingtonlope/todo-api/internal/domain"
-	"github.com/wellingtonlope/todo-api/pkg/clock"
 )
 
 func TestUpdate_Handle(t *testing.T) {
@@ -20,7 +19,7 @@ func TestUpdate_Handle(t *testing.T) {
 	testCases := []struct {
 		name        string
 		updateStore *updateStoreMock
-		clock       *clock.ClientMock
+		clock       *usecase.ClockMock
 		ctx         context.Context
 		input       todo.UpdateInput
 		result      todo.UpdateOutput
@@ -34,7 +33,7 @@ func TestUpdate_Handle(t *testing.T) {
 					Return(domain.Todo{}, todo.ErrGetByIDStoreNotFound).Once()
 				return m
 			}(),
-			clock: clock.NewClientMock(),
+			clock: usecase.NewClockMock(),
 			ctx:   context.TODO(),
 			input: todo.UpdateInput{
 				ID:          "123",
@@ -53,7 +52,7 @@ func TestUpdate_Handle(t *testing.T) {
 					Return(domain.Todo{}, assert.AnError).Once()
 				return m
 			}(),
-			clock: clock.NewClientMock(),
+			clock: usecase.NewClockMock(),
 			ctx:   context.TODO(),
 			input: todo.UpdateInput{
 				ID:          "123",
@@ -78,8 +77,8 @@ func TestUpdate_Handle(t *testing.T) {
 					}, nil).Once()
 				return m
 			}(),
-			clock: func() *clock.ClientMock {
-				m := clock.NewClientMock()
+			clock: func() *usecase.ClockMock {
+				m := usecase.NewClockMock()
 				m.On("Now").Return(exampleDateUpdated).Once()
 				return m
 			}(),
@@ -114,8 +113,8 @@ func TestUpdate_Handle(t *testing.T) {
 				}).Return(todo.ErrUpdateStoreNotFound).Once()
 				return m
 			}(),
-			clock: func() *clock.ClientMock {
-				m := clock.NewClientMock()
+			clock: func() *usecase.ClockMock {
+				m := usecase.NewClockMock()
 				m.On("Now").Return(exampleDateUpdated).Once()
 				return m
 			}(),
@@ -150,8 +149,8 @@ func TestUpdate_Handle(t *testing.T) {
 				}).Return(assert.AnError).Once()
 				return m
 			}(),
-			clock: func() *clock.ClientMock {
-				m := clock.NewClientMock()
+			clock: func() *usecase.ClockMock {
+				m := usecase.NewClockMock()
 				m.On("Now").Return(exampleDateUpdated).Once()
 				return m
 			}(),
@@ -186,8 +185,8 @@ func TestUpdate_Handle(t *testing.T) {
 				}).Return(nil).Once()
 				return m
 			}(),
-			clock: func() *clock.ClientMock {
-				m := clock.NewClientMock()
+			clock: func() *usecase.ClockMock {
+				m := usecase.NewClockMock()
 				m.On("Now").Return(exampleDateUpdated).Once()
 				return m
 			}(),

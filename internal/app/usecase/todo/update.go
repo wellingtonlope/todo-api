@@ -8,7 +8,6 @@ import (
 
 	"github.com/wellingtonlope/todo-api/internal/app/usecase"
 	"github.com/wellingtonlope/todo-api/internal/domain"
-	"github.com/wellingtonlope/todo-api/pkg/clock"
 )
 
 var ErrUpdateStoreNotFound = errors.New("todo not found by ID")
@@ -35,11 +34,11 @@ type (
 	}
 	update struct {
 		store UpdateStore
-		clock clock.Client
+		clock usecase.Clock
 	}
 )
 
-func NewUpdate(store UpdateStore, clock clock.Client) *update {
+func NewUpdate(store UpdateStore, clock usecase.Clock) *update {
 	return &update{
 		store: store,
 		clock: clock,

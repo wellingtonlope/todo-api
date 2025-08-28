@@ -9,6 +9,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	"github.com/wellingtonlope/todo-api/internal/app/usecase"
 	"github.com/wellingtonlope/todo-api/internal/app/usecase/todo"
 	"github.com/wellingtonlope/todo-api/internal/infra/handler"
 	"github.com/wellingtonlope/todo-api/internal/infra/memory"
@@ -54,7 +55,7 @@ func main() {
 			},
 			fx.Annotate(
 				clock.NewClientUTC,
-				fx.As(new(clock.Client)),
+				fx.As(new(usecase.Clock)),
 			),
 			fx.Annotate(
 				memory.NewTodoRepository,

@@ -6,7 +6,6 @@ import (
 
 	"github.com/wellingtonlope/todo-api/internal/app/usecase"
 	"github.com/wellingtonlope/todo-api/internal/domain"
-	"github.com/wellingtonlope/todo-api/pkg/clock"
 )
 
 type (
@@ -29,11 +28,11 @@ type (
 	}
 	create struct {
 		store CreateStore
-		clock clock.Client
+		clock usecase.Clock
 	}
 )
 
-func NewCreate(store CreateStore, clock clock.Client) *create {
+func NewCreate(store CreateStore, clock usecase.Clock) *create {
 	return &create{
 		store: store,
 		clock: clock,
