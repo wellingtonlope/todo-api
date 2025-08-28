@@ -3,6 +3,7 @@ package domain
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -17,6 +18,8 @@ type Todo struct {
 }
 
 func NewTodo(title, description string, date time.Time) (Todo, error) {
+	title = strings.TrimSpace(title)
+	description = strings.TrimSpace(description)
 	if title == "" {
 		return Todo{}, fmt.Errorf("%w: title", ErrTodoInvalidInput)
 	}
@@ -32,6 +35,8 @@ func NewTodo(title, description string, date time.Time) (Todo, error) {
 }
 
 func (t Todo) Update(title, description string, date time.Time) (Todo, error) {
+	title = strings.TrimSpace(title)
+	description = strings.TrimSpace(description)
 	if title == "" {
 		return Todo{}, fmt.Errorf("%w: title", ErrTodoInvalidInput)
 	}
