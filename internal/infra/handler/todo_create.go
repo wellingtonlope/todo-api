@@ -2,7 +2,6 @@ package handler
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/wellingtonlope/todo-api/internal/app/usecase"
@@ -13,13 +12,6 @@ type (
 	todoCreateInput struct {
 		Title       string `json:"title"`
 		Description string `json:"description"`
-	}
-	todoCreateOutput struct {
-		ID          string    `json:"id"`
-		Title       string    `json:"title"`
-		Description string    `json:"description"`
-		CreatedAt   time.Time `json:"created_at"`
-		UpdatedAt   time.Time `json:"updated_at"`
 	}
 	TodoCreate struct {
 		create todo.Create
@@ -53,8 +45,8 @@ func (h *TodoCreate) Method() string {
 	return http.MethodPost
 }
 
-func (h *TodoCreate) usecaseToHandlerOutput(todo todo.CreateOutput) todoCreateOutput {
-	return todoCreateOutput{
+func (h *TodoCreate) usecaseToHandlerOutput(todo todo.CreateOutput) todoOutput {
+	return todoOutput{
 		ID:          todo.ID,
 		Title:       todo.Title,
 		Description: todo.Description,
