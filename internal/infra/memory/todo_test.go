@@ -90,11 +90,12 @@ func TestUpdate(t *testing.T) {
 	repo.todos["123"] = todo
 
 	updatedTodo := domain.Todo{ID: "123", Title: "Updated", Description: "New Desc"}
-	err := repo.Update(context.Background(), updatedTodo)
+	result, err := repo.Update(context.Background(), updatedTodo)
 	assert.Nil(t, err)
+	assert.Equal(t, updatedTodo, result)
 	retrieved, _ := repo.GetByID(context.Background(), "123")
 	assert.Equal(t, updatedTodo, retrieved)
 
-	err = repo.Update(context.Background(), domain.Todo{ID: "999", Title: "Non-existing"})
+	_, err = repo.Update(context.Background(), domain.Todo{ID: "999", Title: "Non-existing"})
 	assert.Equal(t, todoUC.ErrUpdateStoreNotFound, err)
 }

@@ -11,8 +11,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/wellingtonlope/todo-api/internal/app/usecase"
 	"github.com/wellingtonlope/todo-api/internal/app/usecase/todo"
+	gormRepo "github.com/wellingtonlope/todo-api/internal/infra/gorm"
 	"github.com/wellingtonlope/todo-api/internal/infra/handler"
-	"github.com/wellingtonlope/todo-api/internal/infra/memory"
 	"github.com/wellingtonlope/todo-api/pkg/clock"
 	"go.uber.org/fx"
 	"gorm.io/driver/sqlite"
@@ -51,14 +51,21 @@ func main() {
 				return e
 			},
 			func() (*gorm.DB, error) {
-				return gorm.Open(sqlite.Open("todo.db"), &gorm.Config{})
+				db, err := gorm.Open(sqlite.Open("todo.db"), &gorm.Config{})
+				if err != nil {
+					return nil, err
+				}
+				if err := db.AutoMigrate(&gormRepo.TodoModel{}); err != nil {
+					return nil, err
+				}
+				return db, nil
 			},
 			fx.Annotate(
 				clock.NewClientUTC,
 				fx.As(new(usecase.Clock)),
 			),
 			fx.Annotate(
-				memory.NewTodoRepository,
+				gormRepo.NewTodoRepository,
 				fx.As(new(todo.CreateStore)),
 				fx.As(new(todo.GetAllStore)),
 				fx.As(new(todo.GetByIDStore)),

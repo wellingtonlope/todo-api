@@ -43,10 +43,10 @@ func (r *todo) DeleteByID(_ context.Context, id string) error {
 	return nil
 }
 
-func (r *todo) Update(_ context.Context, todo domain.Todo) error {
+func (r *todo) Update(_ context.Context, todo domain.Todo) (domain.Todo, error) {
 	if _, ok := r.todos[todo.ID]; ok {
 		r.todos[todo.ID] = todo
-		return nil
+		return todo, nil
 	}
-	return todoUC.ErrUpdateStoreNotFound
+	return domain.Todo{}, todoUC.ErrUpdateStoreNotFound
 }
