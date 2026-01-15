@@ -29,7 +29,7 @@ func TestTodoGetAll_Handle(t *testing.T) {
 			name: "should fail when get use case fails",
 			getAll: func() *todoGetAllMock {
 				m := new(todoGetAllMock)
-				m.On("Handle", mock.Anything).Return([]todo.GetAllOutput{}, usecase.AnError).Once()
+				m.On("Handle", mock.Anything).Return([]todo.TodoOutput{}, usecase.AnError).Once()
 				return m
 			}(),
 			responseBody:   "",
@@ -40,7 +40,7 @@ func TestTodoGetAll_Handle(t *testing.T) {
 			name: "should get all todos",
 			getAll: func() *todoGetAllMock {
 				m := new(todoGetAllMock)
-				m.On("Handle", mock.Anything).Return([]todo.GetAllOutput{
+				m.On("Handle", mock.Anything).Return([]todo.TodoOutput{
 					{
 						ID:          "123",
 						Title:       "example title",
@@ -85,7 +85,7 @@ type todoGetAllMock struct {
 	mock.Mock
 }
 
-func (m *todoGetAllMock) Handle(ctx context.Context) ([]todo.GetAllOutput, error) {
+func (m *todoGetAllMock) Handle(ctx context.Context) ([]todo.TodoOutput, error) {
 	args := m.Called(ctx)
-	return args.Get(0).([]todo.GetAllOutput), args.Error(1)
+	return args.Get(0).([]todo.TodoOutput), args.Error(1)
 }

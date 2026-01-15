@@ -52,7 +52,7 @@ func TestTodoUpdate_Handle(t *testing.T) {
 					ID:          "123",
 					Title:       "example title",
 					Description: "example description",
-				}).Return(todo.UpdateOutput{}, usecase.AnError).Once()
+				}).Return(todo.TodoOutput{}, usecase.AnError).Once()
 				return m
 			}(),
 			pathID:         "123",
@@ -69,7 +69,7 @@ func TestTodoUpdate_Handle(t *testing.T) {
 					ID:          "123",
 					Title:       "example title",
 					Description: "example description",
-				}).Return(todo.UpdateOutput{
+				}).Return(todo.TodoOutput{
 					ID:          "123",
 					Title:       "example title",
 					Description: "example description",
@@ -118,7 +118,7 @@ type todoUpdateMock struct {
 	mock.Mock
 }
 
-func (m *todoUpdateMock) Handle(ctx context.Context, input todo.UpdateInput) (todo.UpdateOutput, error) {
+func (m *todoUpdateMock) Handle(ctx context.Context, input todo.UpdateInput) (todo.TodoOutput, error) {
 	args := m.Called(ctx, input)
-	return args.Get(0).(todo.UpdateOutput), args.Error(1)
+	return args.Get(0).(todo.TodoOutput), args.Error(1)
 }

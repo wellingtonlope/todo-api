@@ -22,7 +22,7 @@ func (h *TodoGetAll) Handle(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, h.usecaseToHandlerOutput(outputs))
+	return c.JSON(http.StatusOK, todoOutputsFromUsecase(outputs))
 }
 
 func (h *TodoGetAll) Path() string {
@@ -31,18 +31,4 @@ func (h *TodoGetAll) Path() string {
 
 func (h *TodoGetAll) Method() string {
 	return http.MethodGet
-}
-
-func (h *TodoGetAll) usecaseToHandlerOutput(todos []todo.GetAllOutput) []todoOutput {
-	outputs := make([]todoOutput, 0, len(todos))
-	for _, todo := range todos {
-		outputs = append(outputs, todoOutput{
-			ID:          todo.ID,
-			Title:       todo.Title,
-			Description: todo.Description,
-			CreatedAt:   todo.CreatedAt,
-			UpdatedAt:   todo.UpdatedAt,
-		})
-	}
-	return outputs
 }

@@ -22,7 +22,7 @@ func TestUpdate_Handle(t *testing.T) {
 		clock       *usecase.ClockMock
 		ctx         context.Context
 		input       todo.UpdateInput
-		result      todo.UpdateOutput
+		result      todo.TodoOutput
 		err         error
 	}{
 		{
@@ -40,7 +40,7 @@ func TestUpdate_Handle(t *testing.T) {
 				Title:       "example title updated",
 				Description: "example description updated",
 			},
-			result: todo.UpdateOutput{},
+			result: todo.TodoOutput{},
 			err: usecase.NewError("todo not found with id 123",
 				todo.ErrGetByIDStoreNotFound, usecase.ErrorTypeNotFound),
 		},
@@ -59,7 +59,7 @@ func TestUpdate_Handle(t *testing.T) {
 				Title:       "example title updated",
 				Description: "example description updated",
 			},
-			result: todo.UpdateOutput{},
+			result: todo.TodoOutput{},
 			err: usecase.NewError("fail to get a todo by id",
 				assert.AnError, usecase.ErrorTypeInternalError),
 		},
@@ -88,7 +88,7 @@ func TestUpdate_Handle(t *testing.T) {
 				Title:       "",
 				Description: "example description updated",
 			},
-			result: todo.UpdateOutput{},
+			result: todo.TodoOutput{},
 			err: usecase.NewError(fmt.Errorf("%w: title", domain.ErrTodoInvalidInput).Error(),
 				fmt.Errorf("%w: title", domain.ErrTodoInvalidInput), usecase.ErrorTypeBadRequest),
 		},
@@ -110,7 +110,7 @@ func TestUpdate_Handle(t *testing.T) {
 					Description: "example description updated",
 					CreatedAt:   exampleDate,
 					UpdatedAt:   exampleDateUpdated,
-				}).Return(todo.ErrUpdateStoreNotFound).Once()
+				}).Return(domain.Todo{}, todo.ErrUpdateStoreNotFound).Once()
 				return m
 			}(),
 			clock: func() *usecase.ClockMock {
@@ -124,7 +124,7 @@ func TestUpdate_Handle(t *testing.T) {
 				Title:       "example title updated",
 				Description: "example description updated",
 			},
-			result: todo.UpdateOutput{},
+			result: todo.TodoOutput{},
 			err: usecase.NewError("todo not found with id 123",
 				todo.ErrUpdateStoreNotFound, usecase.ErrorTypeNotFound),
 		},
@@ -146,7 +146,7 @@ func TestUpdate_Handle(t *testing.T) {
 					Description: "example description updated",
 					CreatedAt:   exampleDate,
 					UpdatedAt:   exampleDateUpdated,
-				}).Return(assert.AnError).Once()
+				}).Return(domain.Todo{}, assert.AnError).Once()
 				return m
 			}(),
 			clock: func() *usecase.ClockMock {
@@ -160,7 +160,7 @@ func TestUpdate_Handle(t *testing.T) {
 				Title:       "example title updated",
 				Description: "example description updated",
 			},
-			result: todo.UpdateOutput{},
+			result: todo.TodoOutput{},
 			err: usecase.NewError("fail to update a todo in the store", assert.AnError,
 				usecase.ErrorTypeInternalError),
 		},
@@ -182,7 +182,13 @@ func TestUpdate_Handle(t *testing.T) {
 					Description: "example description updated",
 					CreatedAt:   exampleDate,
 					UpdatedAt:   exampleDateUpdated,
-				}).Return(nil).Once()
+				}).Return(domain.Todo{
+					ID:          "123",
+					Title:       "example title updated",
+					Description: "example description updated",
+					CreatedAt:   exampleDate,
+					UpdatedAt:   exampleDateUpdated,
+				}, nil).Once()
 				return m
 			}(),
 			clock: func() *usecase.ClockMock {
@@ -196,7 +202,7 @@ func TestUpdate_Handle(t *testing.T) {
 				Title:       "example title updated",
 				Description: "example description updated",
 			},
-			result: todo.UpdateOutput{
+			result: todo.TodoOutput{
 				ID:          "123",
 				Title:       "example title updated",
 				Description: "example description updated",
@@ -227,7 +233,7 @@ func (m *updateStoreMock) GetByID(ctx context.Context, id string) (domain.Todo, 
 	return args.Get(0).(domain.Todo), args.Error(1)
 }
 
-func (m *updateStoreMock) Update(ctx context.Context, todo domain.Todo) error {
+func (m *updateStoreMock) Update(ctx context.Context, todo domain.Todo) (domain.Todo, error) {
 	args := m.Called(ctx, todo)
-	return args.Error(0)
+	return args.Get(0).(domain.Todo), args.Error(1)
 }

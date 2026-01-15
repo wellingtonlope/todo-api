@@ -36,7 +36,7 @@ func (h *TodoUpdate) Handle(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, h.usecaseToHandlerOutput(output))
+	return c.JSON(http.StatusOK, todoOutputFromUsecase(output))
 }
 
 func (h *TodoUpdate) Path() string {
@@ -45,14 +45,4 @@ func (h *TodoUpdate) Path() string {
 
 func (h *TodoUpdate) Method() string {
 	return http.MethodPut
-}
-
-func (h *TodoUpdate) usecaseToHandlerOutput(todo todo.UpdateOutput) todoOutput {
-	return todoOutput{
-		ID:          todo.ID,
-		Title:       todo.Title,
-		Description: todo.Description,
-		CreatedAt:   todo.CreatedAt,
-		UpdatedAt:   todo.UpdatedAt,
-	}
 }

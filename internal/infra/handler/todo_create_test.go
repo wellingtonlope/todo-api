@@ -49,7 +49,7 @@ func TestTodoCreate_Handle(t *testing.T) {
 				m.On("Handle", mock.Anything, todo.CreateInput{
 					Title:       "example title",
 					Description: "example description",
-				}).Return(todo.CreateOutput{}, usecase.AnError).Once()
+				}).Return(todo.TodoOutput{}, usecase.AnError).Once()
 				return m
 			}(),
 			requestBody:    `{"title":"example title","description":"example description"}`,
@@ -64,7 +64,7 @@ func TestTodoCreate_Handle(t *testing.T) {
 				m.On("Handle", mock.Anything, todo.CreateInput{
 					Title:       "example title",
 					Description: "example description",
-				}).Return(todo.CreateOutput{
+				}).Return(todo.TodoOutput{
 					ID:          "123",
 					Title:       "example title",
 					Description: "example description",
@@ -110,7 +110,7 @@ type todoCreateMock struct {
 	mock.Mock
 }
 
-func (m *todoCreateMock) Handle(ctx context.Context, input todo.CreateInput) (todo.CreateOutput, error) {
+func (m *todoCreateMock) Handle(ctx context.Context, input todo.CreateInput) (todo.TodoOutput, error) {
 	args := m.Called(ctx, input)
-	return args.Get(0).(todo.CreateOutput), args.Error(1)
+	return args.Get(0).(todo.TodoOutput), args.Error(1)
 }

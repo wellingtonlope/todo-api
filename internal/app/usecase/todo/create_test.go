@@ -21,7 +21,7 @@ func TestCreate_Handle(t *testing.T) {
 		clock       *usecase.ClockMock
 		ctx         context.Context
 		input       todo.CreateInput
-		result      todo.CreateOutput
+		result      todo.TodoOutput
 		err         error
 	}{
 		{
@@ -37,7 +37,7 @@ func TestCreate_Handle(t *testing.T) {
 				Title:       "",
 				Description: "example description",
 			},
-			result: todo.CreateOutput{},
+			result: todo.TodoOutput{},
 			err: usecase.NewError(fmt.Errorf("%w: title", domain.ErrTodoInvalidInput).Error(),
 				fmt.Errorf("%w: title", domain.ErrTodoInvalidInput), usecase.ErrorTypeBadRequest),
 		},
@@ -63,7 +63,7 @@ func TestCreate_Handle(t *testing.T) {
 				Title:       "example title",
 				Description: "example description",
 			},
-			result: todo.CreateOutput{},
+			result: todo.TodoOutput{},
 			err: usecase.NewError("fail to create a todo in the repository", assert.AnError,
 				usecase.ErrorTypeInternalError),
 		},
@@ -95,7 +95,7 @@ func TestCreate_Handle(t *testing.T) {
 				Title:       "example title",
 				Description: "example description",
 			},
-			result: todo.CreateOutput{
+			result: todo.TodoOutput{
 				ID:          "123",
 				Title:       "example title",
 				Description: "example description",

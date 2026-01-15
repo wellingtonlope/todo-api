@@ -19,7 +19,7 @@ func TestGetByID_Handle(t *testing.T) {
 		store  *getByIDStoreMock
 		ctx    context.Context
 		id     string
-		result todo.GetByIDOutput
+		result todo.TodoOutput
 		err    error
 	}{
 		{
@@ -32,7 +32,7 @@ func TestGetByID_Handle(t *testing.T) {
 			}(),
 			ctx:    context.TODO(),
 			id:     "123",
-			result: todo.GetByIDOutput{},
+			result: todo.TodoOutput{},
 			err: usecase.NewError("todo not found with id 123",
 				todo.ErrGetByIDStoreNotFound, usecase.ErrorTypeNotFound),
 		},
@@ -46,7 +46,7 @@ func TestGetByID_Handle(t *testing.T) {
 			}(),
 			ctx:    context.TODO(),
 			id:     "123",
-			result: todo.GetByIDOutput{},
+			result: todo.TodoOutput{},
 			err: usecase.NewError("fail to get a todo by id",
 				assert.AnError, usecase.ErrorTypeInternalError),
 		},
@@ -66,7 +66,7 @@ func TestGetByID_Handle(t *testing.T) {
 			}(),
 			ctx: context.TODO(),
 			id:  "123",
-			result: todo.GetByIDOutput{
+			result: todo.TodoOutput{
 				ID:          "123",
 				Title:       "title",
 				Description: "description",

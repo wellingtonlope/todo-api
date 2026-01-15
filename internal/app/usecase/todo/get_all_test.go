@@ -18,7 +18,7 @@ func TestGetAll_Handle(t *testing.T) {
 		name   string
 		store  *getAllStoreMock
 		ctx    context.Context
-		result []todo.GetAllOutput
+		result []todo.TodoOutput
 		err    error
 	}{
 		{
@@ -30,7 +30,7 @@ func TestGetAll_Handle(t *testing.T) {
 				return m
 			}(),
 			ctx:    context.TODO(),
-			result: []todo.GetAllOutput{},
+			result: []todo.TodoOutput{},
 			err: usecase.NewError("fail to get all todos",
 				assert.AnError, usecase.ErrorTypeInternalError),
 		},
@@ -51,7 +51,7 @@ func TestGetAll_Handle(t *testing.T) {
 				return m
 			}(),
 			ctx: context.TODO(),
-			result: []todo.GetAllOutput{
+			result: []todo.TodoOutput{
 				{
 					ID:          "123",
 					Title:       "title",

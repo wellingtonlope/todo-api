@@ -30,7 +30,7 @@ func TestTodoGetByID_Handle(t *testing.T) {
 			name: "should fail when get use case fails",
 			getByID: func() *todoGetByIDMock {
 				m := new(todoGetByIDMock)
-				m.On("Handle", mock.Anything, "123").Return(todo.GetByIDOutput{}, usecase.AnError).Once()
+				m.On("Handle", mock.Anything, "123").Return(todo.TodoOutput{}, usecase.AnError).Once()
 				return m
 			}(),
 			pathID:         "123",
@@ -42,7 +42,7 @@ func TestTodoGetByID_Handle(t *testing.T) {
 			name: "should get a todo by id",
 			getByID: func() *todoGetByIDMock {
 				m := new(todoGetByIDMock)
-				m.On("Handle", mock.Anything, "123").Return(todo.GetByIDOutput{
+				m.On("Handle", mock.Anything, "123").Return(todo.TodoOutput{
 					ID:          "123",
 					Title:       "example title",
 					Description: "example description",
@@ -89,7 +89,7 @@ type todoGetByIDMock struct {
 	mock.Mock
 }
 
-func (m *todoGetByIDMock) Handle(ctx context.Context, id string) (todo.GetByIDOutput, error) {
+func (m *todoGetByIDMock) Handle(ctx context.Context, id string) (todo.TodoOutput, error) {
 	args := m.Called(ctx, id)
-	return args.Get(0).(todo.GetByIDOutput), args.Error(1)
+	return args.Get(0).(todo.TodoOutput), args.Error(1)
 }
