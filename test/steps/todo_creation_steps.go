@@ -2,7 +2,6 @@ package steps
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http/httptest"
@@ -33,18 +32,13 @@ func (tc *TodoCreationContext) SetTodoInput(title, desc, dueDate string) {
 	}
 }
 
-func (tc *TodoCreationContext) IHaveATodoInputWithTitle(title string) error {
-	tc.SetTodoInput(title, "", "")
-	return nil
-}
-
-func (tc *TodoCreationContext) IHaveATodoInputWithTitleAndDescription(title, desc string) error {
-	tc.SetTodoInput(title, desc, "")
-	return nil
-}
-
-func (tc *TodoCreationContext) IHaveATodoInputWithTitleDescriptionAndDueDate(title, desc, dueDate string) error {
+func (tc *TodoCreationContext) IHaveATodoInput(title, desc, dueDate string) error {
 	tc.SetTodoInput(title, desc, dueDate)
+	return nil
+}
+
+func (tc *TodoCreationContext) ResetDatabase() error {
+	tc.DB.Exec("DELETE FROM todos")
 	return nil
 }
 
@@ -68,11 +62,7 @@ func validateResponseHeaders(tc *TodoCreationContext, expectedStatus int) error 
 	return nil
 }
 
-func (tc *TodoCreationContext) TheTodoShouldBeCreatedSuccessfully() error {
-	if err := validateResponseHeaders(tc, 201); err != nil {
-		return err
-	}
-
+func validateTodoResponse(tc *TodoCreationContext) error {
 	// Parse JSON
 	var resp struct {
 		ID          string     `json:"id"`
@@ -128,6 +118,14 @@ func (tc *TodoCreationContext) TheTodoShouldBeCreatedSuccessfully() error {
 	return nil
 }
 
+func (tc *TodoCreationContext) TheTodoShouldBeCreatedSuccessfully() error {
+	if err := validateResponseHeaders(tc, 201); err != nil {
+		return err
+	}
+
+	return validateTodoResponse(tc)
+}
+
 func (tc *TodoCreationContext) TheCreationShouldFailWithValidationError() error {
 	if err := validateResponseHeaders(tc, 400); err != nil {
 		return err
@@ -151,15 +149,8 @@ func (tc *TodoCreationContext) TheCreationShouldFailWithValidationError() error 
 }
 
 func (tc *TodoCreationContext) InitializeScenario(ctx *godog.ScenarioContext) {
-	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
-		// Reset DB
-		tc.DB.Exec("DELETE FROM todos")
-		return ctx, nil
-	})
-
-	ctx.Step(`^I have a todo input with title "([^"]*)"$`, tc.IHaveATodoInputWithTitle)
-	ctx.Step(`^I have a todo input with title "([^"]*)" and description "([^"]*)"$`, tc.IHaveATodoInputWithTitleAndDescription)
-	ctx.Step(`^I have a todo input with title "([^"]*)", description "([^"]*)" and due_date "([^"]*)"$`, tc.IHaveATodoInputWithTitleDescriptionAndDueDate)
+	ctx.Step(`^the database is reset$`, tc.ResetDatabase)
+	ctx.Step(`^I have a todo input with title "([^"]*)", description "([^"]*)" and due_date "([^"]*)"$`, tc.IHaveATodoInput)
 	ctx.Step(`^I create the todo$`, tc.ICreateTheTodo)
 	ctx.Step(`^the todo should be created successfully$`, tc.TheTodoShouldBeCreatedSuccessfully)
 	ctx.Step(`^the creation should fail with validation error$`, tc.TheCreationShouldFailWithValidationError)
