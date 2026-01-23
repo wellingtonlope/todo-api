@@ -5,37 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http/httptest"
-	"strings"
-	"time"
 
 	"github.com/cucumber/godog"
-	"github.com/labstack/echo/v4"
-	"gorm.io/gorm"
 )
 
 type TodoGetByIDContext struct {
-	TodoInput     map[string]interface{}
-	Response      *httptest.ResponseRecorder
-	EchoApp       *echo.Echo
-	DB            *gorm.DB
+	BaseTestContext
 	CreatedTodoID string
-}
-
-func (tc *TodoGetByIDContext) SetTodoInput(title, desc, dueDate string) {
-	tc.TodoInput = map[string]interface{}{
-		"title": title,
-	}
-	if desc != "" {
-		tc.TodoInput["description"] = desc
-	}
-	if dueDate != "" {
-		tc.TodoInput["due_date"] = dueDate
-	}
-}
-
-func (tc *TodoGetByIDContext) ResetDatabase() error {
-	tc.DB.Exec("DELETE FROM todos")
-	return nil
 }
 
 func (tc *TodoGetByIDContext) IHaveCreatedATodo(title, desc, dueDate string) error {
@@ -74,107 +50,16 @@ func (tc *TodoGetByIDContext) IRequestTheTodoWithID(id string) error {
 	return nil
 }
 
-func validateGetByIDResponseHeaders(tc *TodoGetByIDContext, expectedStatus int) error {
-	if tc.Response.Code != expectedStatus {
-		return fmt.Errorf("expected status %d, got %d, body: %s", expectedStatus, tc.Response.Code, tc.Response.Body.String())
-	}
-	if expectedStatus == 200 && tc.Response.Header().Get("Content-Type") != "application/json" {
-		return fmt.Errorf("expected Content-Type application/json, got %s", tc.Response.Header().Get("Content-Type"))
-	}
-	return nil
-}
-
-func validateRetrievedTodoResponse(tc *TodoGetByIDContext, expectedTitle, expectedDesc, expectedDueDate string) error {
-	// Parse JSON
-	var resp struct {
-		ID          string     `json:"id"`
-		Title       string     `json:"title"`
-		Description string     `json:"description"`
-		Status      string     `json:"status"`
-		CreatedAt   time.Time  `json:"created_at"`
-		UpdatedAt   time.Time  `json:"updated_at"`
-		DueDate     *time.Time `json:"due_date,omitempty"`
-	}
-	err := json.Unmarshal(tc.Response.Body.Bytes(), &resp)
-	if err != nil {
-		return err
-	}
-
-	// Validate fields
-	if resp.ID != tc.CreatedTodoID {
-		return fmt.Errorf("expected ID %s, got %s", tc.CreatedTodoID, resp.ID)
-	}
-	if resp.Title != expectedTitle {
-		return fmt.Errorf("expected title %s, got %s", expectedTitle, resp.Title)
-	}
-	expectedDescPresent := expectedDesc != ""
-	if expectedDescPresent {
-		if resp.Description != expectedDesc {
-			return fmt.Errorf("expected description %s, got %s", expectedDesc, resp.Description)
-		}
-	} else {
-		if resp.Description != "" {
-			return fmt.Errorf("expected description to be empty, got %s", resp.Description)
-		}
-	}
-	if resp.Status != "pending" {
-		return fmt.Errorf("expected status pending, got %s", resp.Status)
-	}
-	if resp.CreatedAt.IsZero() {
-		return fmt.Errorf("CreatedAt should not be zero")
-	}
-	if resp.UpdatedAt.IsZero() {
-		return fmt.Errorf("UpdatedAt should not be zero")
-	}
-	expectedDueDatePresent := expectedDueDate != ""
-	if expectedDueDatePresent {
-		if resp.DueDate == nil {
-			return fmt.Errorf("DueDate should not be nil")
-		}
-		parsedDueDate, err := time.Parse(time.RFC3339, expectedDueDate)
-		if err != nil {
-			return fmt.Errorf("invalid due_date format in test: %s", expectedDueDate)
-		}
-		if !resp.DueDate.Equal(parsedDueDate) {
-			return fmt.Errorf("expected due_date %v, got %v", parsedDueDate, resp.DueDate)
-		}
-	} else {
-		if resp.DueDate != nil {
-			return fmt.Errorf("DueDate should be nil")
-		}
-	}
-
-	return nil
-}
-
 func (tc *TodoGetByIDContext) TheTodoShouldBeRetrievedSuccessfullyWithTitleDescDueDate(title, desc, dueDate string) error {
-	if err := validateGetByIDResponseHeaders(tc, 200); err != nil {
+	if err := validateResponseHeaders(tc.Response, StatusOK); err != nil {
 		return err
 	}
 
-	return validateRetrievedTodoResponse(tc, title, desc, dueDate)
+	return validateRetrievedTodoResponse(tc.Response, tc.CreatedTodoID, title, desc, dueDate)
 }
 
 func (tc *TodoGetByIDContext) TheRetrievalShouldFailWithNotFoundError() error {
-	if err := validateGetByIDResponseHeaders(tc, 404); err != nil {
-		return err
-	}
-
-	// Parse error JSON
-	var resp struct {
-		Message string `json:"message"`
-	}
-	err := json.Unmarshal(tc.Response.Body.Bytes(), &resp)
-	if err != nil {
-		return err
-	}
-
-	// Validate error
-	if !strings.Contains(resp.Message, "not found") {
-		return fmt.Errorf("expected message to contain 'not found', got %s", resp.Message)
-	}
-
-	return nil
+	return validateErrorResponse(tc.Response, StatusNotFound, "not found")
 }
 
 func (tc *TodoGetByIDContext) InitializeScenario(ctx *godog.ScenarioContext) {
