@@ -134,6 +134,10 @@ Run `make format` (gofumpt) before committing. Gofumpt is stricter than gofmt: n
 
 Run `make lint` (golangci-lint) before committing.
 
+### Commit Guidelines
+
+Follow the commit message convention defined in [CONTRIBUTING.md](CONTRIBUTING.md). Use Conventional Commits format (e.g., `feat: add new feature`, `fix: resolve bug`). Always read CONTRIBUTING.md before creating commits to ensure proper formatting.
+
 ### Language
 
 All code and documentation must be written in English.
