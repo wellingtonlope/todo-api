@@ -31,6 +31,9 @@ gofumpt -w .
 # Run linter
 make lint
 golangci-lint run
+
+# Generate Swagger docs
+swag init -g cmd/api/main.go -o docs/
 ```
 
 ### Testing Patterns
@@ -139,10 +142,19 @@ Run `make lint` (golangci-lint) before committing.
 - Name test cases clearly (e.g., "should fail when input is invalid")
 - Always call `AssertExpectations()` on mocks
 
+## Swagger Documentation Guidelines
+
+- Use `// @Summary`, `// @Description`, `// @Tags`, `// @Param`, `// @Success`, `// @Failure`, `// @Router` annotations above handler methods
+- Define global API info in `cmd/api/main.go` with `@title`, `@version`, `@description`, `@host`, `@BasePath`
+- Add `ErrorResponse` struct in `internal/infra/handler/handler.go` for error responses
+- Access documentation at `/swagger/index.html` when server is running
+- Regenerate docs after changes: `swag init -g cmd/api/main.go -o docs/`
+
 ## File Structure
 
 ```
 cmd/api/              # Application entrypoint
+docs/                 # Generated Swagger documentation
 internal/
   domain/             # Business entities and domain errors
   app/
@@ -162,3 +174,5 @@ pkg/
 - `gorm.io/gorm` - ORM
 - `github.com/stretchr/testify` - Testing utilities
 - `github.com/google/uuid` - UUID generation
+- `github.com/swaggo/echo-swagger` - Swagger UI for Echo
+- `github.com/swaggo/swag` - Swagger documentation generator
