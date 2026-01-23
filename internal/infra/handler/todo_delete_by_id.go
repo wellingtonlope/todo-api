@@ -17,6 +17,13 @@ func NewTodoDeleteByID(deleteByID todo.DeleteByID) *TodoDeleteByID {
 	return &TodoDeleteByID{deleteByID: deleteByID}
 }
 
+// @Summary Delete a todo by ID
+// @Description Delete a todo item by its ID
+// @Tags todos
+// @Param id path string true "Todo ID"
+// @Success 204 "No Content"
+// @Failure 404 {object} ErrorResponse
+// @Router /todos/{id} [delete]
 func (h *TodoDeleteByID) Handle(c echo.Context) error {
 	id := c.Param("id")
 	err := h.deleteByID.Handle(c.Request().Context(), id)

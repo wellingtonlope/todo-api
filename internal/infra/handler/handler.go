@@ -13,6 +13,10 @@ type Handler interface {
 	Method() string
 }
 
+type ErrorResponse struct {
+	Message string `json:"message"`
+}
+
 type todoOutput struct {
 	ID          string    `json:"id"`
 	Title       string    `json:"title"`

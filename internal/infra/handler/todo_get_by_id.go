@@ -17,6 +17,14 @@ func NewTodoGetByID(getByID todo.GetByID) *TodoGetByID {
 	return &TodoGetByID{getByID: getByID}
 }
 
+// @Summary Get a todo by ID
+// @Description Retrieve a todo item by its ID
+// @Tags todos
+// @Produce json
+// @Param id path string true "Todo ID"
+// @Success 200 {object} todoOutput
+// @Failure 404 {object} ErrorResponse
+// @Router /todos/{id} [get]
 func (h *TodoGetByID) Handle(c echo.Context) error {
 	id := c.Param("id")
 	output, err := h.getByID.Handle(c.Request().Context(), id)

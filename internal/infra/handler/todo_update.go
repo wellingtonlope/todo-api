@@ -22,6 +22,17 @@ func NewTodoUpdate(update todo.Update) *TodoUpdate {
 	return &TodoUpdate{update: update}
 }
 
+// @Summary Update a todo
+// @Description Update an existing todo item
+// @Tags todos
+// @Accept json
+// @Produce json
+// @Param id path string true "Todo ID"
+// @Param todo body todoUpdateInput true "Updated todo data"
+// @Success 200 {object} todoOutput
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Router /todos/{id} [put]
 func (h *TodoUpdate) Handle(c echo.Context) error {
 	id := c.Param("id")
 	var input todoUpdateInput

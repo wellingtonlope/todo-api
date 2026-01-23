@@ -1,3 +1,8 @@
+// @title Todo API
+// @version 1.0
+// @description API for managing todo items
+// @host localhost:1323
+// @BasePath /
 package main
 
 import (
@@ -9,6 +14,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	echoSwagger "github.com/swaggo/echo-swagger"
+	_ "github.com/wellingtonlope/todo-api/docs"
 	"github.com/wellingtonlope/todo-api/internal/app/usecase"
 	"github.com/wellingtonlope/todo-api/internal/app/usecase/todo"
 	gormRepo "github.com/wellingtonlope/todo-api/internal/infra/gorm"
@@ -127,6 +134,9 @@ func main() {
 				},
 				fx.ParamTags(`group:"handlers"`),
 			),
+			func(e *echo.Echo) {
+				e.GET("/swagger/*", echoSwagger.WrapHandler)
+			},
 		),
 	).Run()
 }

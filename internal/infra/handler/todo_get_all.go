@@ -17,6 +17,12 @@ func NewTodoGetAll(getAll todo.GetAll) *TodoGetAll {
 	return &TodoGetAll{getAll: getAll}
 }
 
+// @Summary Get all todos
+// @Description Retrieve all todo items
+// @Tags todos
+// @Produce json
+// @Success 200 {array} todoOutput
+// @Router /todos [get]
 func (h *TodoGetAll) Handle(c echo.Context) error {
 	outputs, err := h.getAll.Handle(c.Request().Context())
 	if err != nil {

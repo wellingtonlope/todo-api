@@ -22,6 +22,15 @@ func NewTodoCreate(create todo.Create) *TodoCreate {
 	return &TodoCreate{create: create}
 }
 
+// @Summary Create a todo
+// @Description Create a new todo item
+// @Tags todos
+// @Accept json
+// @Produce json
+// @Param todo body todoCreateInput true "Todo data"
+// @Success 201 {object} todoOutput
+// @Failure 400 {object} ErrorResponse
+// @Router /todos [post]
 func (h *TodoCreate) Handle(c echo.Context) error {
 	var input todoCreateInput
 	if err := c.Bind(&input); err != nil {
