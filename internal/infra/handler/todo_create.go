@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/wellingtonlope/todo-api/internal/app/usecase"
@@ -10,8 +11,9 @@ import (
 
 type (
 	todoCreateInput struct {
-		Title       string `json:"title"`
-		Description string `json:"description"`
+		Title       string     `json:"title"`
+		Description string     `json:"description"`
+		DueDate     *time.Time `json:"due_date,omitempty"`
 	}
 	TodoCreate struct {
 		create todo.Create
@@ -29,6 +31,7 @@ func NewTodoCreate(create todo.Create) *TodoCreate {
 // @Produce json
 // @Param todo body todoCreateInput true "Todo data"
 // @Success 201 {object} todoOutput
+// @Success 201 {object} todoOutput
 // @Failure 400 {object} ErrorResponse
 // @Router /todos [post]
 func (h *TodoCreate) Handle(c echo.Context) error {
@@ -39,6 +42,7 @@ func (h *TodoCreate) Handle(c echo.Context) error {
 	output, err := h.create.Handle(c.Request().Context(), todo.CreateInput{
 		Title:       input.Title,
 		Description: input.Description,
+		DueDate:     input.DueDate,
 	})
 	if err != nil {
 		return err

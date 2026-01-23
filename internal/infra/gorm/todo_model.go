@@ -10,6 +10,7 @@ type TodoModel struct {
 	ID          string `gorm:"primaryKey"`
 	Title       string `gorm:"not null"`
 	Description string
+	DueDate     *time.Time
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
@@ -23,6 +24,7 @@ func toDomain(m TodoModel) domain.Todo {
 		ID:          m.ID,
 		Title:       m.Title,
 		Description: m.Description,
+		DueDate:     m.DueDate,
 		CreatedAt:   m.CreatedAt,
 		UpdatedAt:   m.UpdatedAt,
 	}
@@ -33,6 +35,7 @@ func fromDomain(t domain.Todo) TodoModel {
 		ID:          t.ID,
 		Title:       t.Title,
 		Description: t.Description,
+		DueDate:     t.DueDate,
 		CreatedAt:   t.CreatedAt,
 		UpdatedAt:   t.UpdatedAt,
 	}

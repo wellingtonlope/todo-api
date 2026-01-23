@@ -199,6 +199,9 @@
                 "description": {
                     "type": "string"
                 },
+                "due_date": {
+                    "type": "string"
+                },
                 "title": {
                     "type": "string"
                 }
@@ -211,6 +214,9 @@
                     "type": "string"
                 },
                 "description": {
+                    "type": "string"
+                },
+                "due_date": {
                     "type": "string"
                 },
                 "id": {
@@ -228,6 +234,9 @@
             "type": "object",
             "properties": {
                 "description": {
+                    "type": "string"
+                },
+                "due_date": {
                     "type": "string"
                 },
                 "title": {

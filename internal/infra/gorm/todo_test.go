@@ -31,7 +31,7 @@ func TestCreate(t *testing.T) {
 	db := setupTestDB(t)
 	repo := NewTodoRepository(db)
 	date := time.Now().UTC()
-	todo, _ := domain.NewTodo("Test Todo", "Test Description", date)
+	todo, _ := domain.NewTodo("Test Todo", "Test Description", date, nil)
 	created, err := repo.Create(context.Background(), todo)
 	assert.Nil(t, err)
 	assert.NotEqual(t, "", created.ID)
@@ -49,8 +49,8 @@ func TestGetAll(t *testing.T) {
 	assert.Len(t, todos, 0)
 
 	date := time.Now().UTC()
-	todo1, _ := domain.NewTodo("Todo 1", "", date)
-	todo2, _ := domain.NewTodo("Todo 2", "", date)
+	todo1, _ := domain.NewTodo("Todo 1", "", date, nil)
+	todo2, _ := domain.NewTodo("Todo 2", "", date, nil)
 	_, err = repo.Create(context.Background(), todo1)
 	assert.Nil(t, err)
 	_, err = repo.Create(context.Background(), todo2)
@@ -72,7 +72,7 @@ func TestGetByID(t *testing.T) {
 	db := setupTestDB(t)
 	repo := NewTodoRepository(db)
 	date := time.Now().UTC()
-	todo, _ := domain.NewTodo("Test", "", date)
+	todo, _ := domain.NewTodo("Test", "", date, nil)
 	_, err := repo.Create(context.Background(), todo)
 	assert.Nil(t, err)
 	created, err := repo.Create(context.Background(), todo)
@@ -101,7 +101,7 @@ func TestDeleteByID(t *testing.T) {
 	db := setupTestDB(t)
 	repo := NewTodoRepository(db)
 	date := time.Now().UTC()
-	todo, _ := domain.NewTodo("Test", "", date)
+	todo, _ := domain.NewTodo("Test", "", date, nil)
 	created, _ := repo.Create(context.Background(), todo)
 
 	err := repo.DeleteByID(context.Background(), created.ID)
@@ -117,7 +117,7 @@ func TestUpdate(t *testing.T) {
 	db := setupTestDB(t)
 	repo := NewTodoRepository(db)
 	date := time.Now().UTC()
-	todo, _ := domain.NewTodo("Original", "", date)
+	todo, _ := domain.NewTodo("Original", "", date, nil)
 	created, _ := repo.Create(context.Background(), todo)
 
 	updatedTodo := created

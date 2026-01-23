@@ -9,6 +9,8 @@ definitions:
     properties:
       description:
         type: string
+      due_date:
+        type: string
       title:
         type: string
     type: object
@@ -17,6 +19,8 @@ definitions:
       created_at:
         type: string
       description:
+        type: string
+      due_date:
         type: string
       id:
         type: string
@@ -28,6 +32,8 @@ definitions:
   handler.todoUpdateInput:
     properties:
       description:
+        type: string
+      due_date:
         type: string
       title:
         type: string

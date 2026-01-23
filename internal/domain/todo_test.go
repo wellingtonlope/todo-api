@@ -16,6 +16,7 @@ func TestNewTodo(t *testing.T) {
 	exampleTodo := domain.Todo{
 		Title:       exampleTitle,
 		Description: exampleDescription,
+		DueDate:     nil,
 		CreatedAt:   exampleDate,
 		UpdatedAt:   exampleDate,
 	}
@@ -24,6 +25,7 @@ func TestNewTodo(t *testing.T) {
 		title       string
 		description string
 		date        time.Time
+		dueDate     *time.Time
 		result      domain.Todo
 		err         error
 	}{
@@ -32,6 +34,7 @@ func TestNewTodo(t *testing.T) {
 			title:       "",
 			description: exampleDescription,
 			date:        exampleDate,
+			dueDate:     nil,
 			result:      domain.Todo{},
 			err:         fmt.Errorf("%w: title", domain.ErrTodoInvalidInput),
 		},
@@ -40,6 +43,7 @@ func TestNewTodo(t *testing.T) {
 			title:       " ",
 			description: exampleDescription,
 			date:        exampleDate,
+			dueDate:     nil,
 			result:      domain.Todo{},
 			err:         fmt.Errorf("%w: title", domain.ErrTodoInvalidInput),
 		},
@@ -48,6 +52,7 @@ func TestNewTodo(t *testing.T) {
 			title:       exampleTitle,
 			description: exampleDescription,
 			date:        time.Time{},
+			dueDate:     nil,
 			result:      domain.Todo{},
 			err:         fmt.Errorf("%w: date", domain.ErrTodoInvalidInput),
 		},
@@ -56,6 +61,7 @@ func TestNewTodo(t *testing.T) {
 			title:       exampleTitle,
 			description: exampleDescription,
 			date:        exampleDate,
+			dueDate:     nil,
 			result:      exampleTodo,
 			err:         nil,
 		},
@@ -64,13 +70,14 @@ func TestNewTodo(t *testing.T) {
 			title:       " title example ",
 			description: " description example ",
 			date:        exampleDate,
+			dueDate:     nil,
 			result:      exampleTodo,
 			err:         nil,
 		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			result, err := domain.NewTodo(tc.title, tc.description, tc.date)
+			result, err := domain.NewTodo(tc.title, tc.description, tc.date, tc.dueDate)
 			assert.Equal(t, tc.result, result)
 			assert.Equal(t, tc.err, err)
 		})
@@ -87,12 +94,14 @@ func TestTodo_Update(t *testing.T) {
 	exampleTodo := domain.Todo{
 		Title:       exampleTitle,
 		Description: exampleDescription,
+		DueDate:     nil,
 		CreatedAt:   exampleDate,
 		UpdatedAt:   exampleDate,
 	}
 	exampleTodoUpdated := domain.Todo{
 		Title:       exampleTitleUpdated,
 		Description: exampleDescriptionUpdated,
+		DueDate:     nil,
 		CreatedAt:   exampleDate,
 		UpdatedAt:   exampleDateUpdated,
 	}
@@ -101,6 +110,7 @@ func TestTodo_Update(t *testing.T) {
 		title       string
 		description string
 		date        time.Time
+		dueDate     *time.Time
 		todo        domain.Todo
 		result      domain.Todo
 		err         error
@@ -110,6 +120,7 @@ func TestTodo_Update(t *testing.T) {
 			title:       "",
 			description: exampleDescriptionUpdated,
 			date:        exampleDateUpdated,
+			dueDate:     nil,
 			todo:        exampleTodo,
 			result:      domain.Todo{},
 			err:         fmt.Errorf("%w: title", domain.ErrTodoInvalidInput),
@@ -119,6 +130,7 @@ func TestTodo_Update(t *testing.T) {
 			title:       " ",
 			description: exampleDescriptionUpdated,
 			date:        exampleDateUpdated,
+			dueDate:     nil,
 			todo:        exampleTodo,
 			result:      domain.Todo{},
 			err:         fmt.Errorf("%w: title", domain.ErrTodoInvalidInput),
@@ -128,6 +140,7 @@ func TestTodo_Update(t *testing.T) {
 			title:       exampleTitleUpdated,
 			description: exampleDescriptionUpdated,
 			date:        time.Time{},
+			dueDate:     nil,
 			todo:        exampleTodo,
 			result:      domain.Todo{},
 			err:         fmt.Errorf("%w: date", domain.ErrTodoInvalidInput),
@@ -137,6 +150,7 @@ func TestTodo_Update(t *testing.T) {
 			title:       exampleTitleUpdated,
 			description: exampleDescriptionUpdated,
 			date:        exampleDateUpdated,
+			dueDate:     nil,
 			todo:        exampleTodo,
 			result:      exampleTodoUpdated,
 			err:         nil,
@@ -146,6 +160,7 @@ func TestTodo_Update(t *testing.T) {
 			title:       " title example updated ",
 			description: " description example updated ",
 			date:        exampleDateUpdated,
+			dueDate:     nil,
 			todo:        exampleTodo,
 			result:      exampleTodoUpdated,
 			err:         nil,
@@ -153,7 +168,7 @@ func TestTodo_Update(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			result, err := tc.todo.Update(tc.title, tc.description, tc.date)
+			result, err := tc.todo.Update(tc.title, tc.description, tc.date, tc.dueDate)
 			assert.Equal(t, tc.result, result)
 			assert.Equal(t, tc.err, err)
 		})

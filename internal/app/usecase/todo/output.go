@@ -11,6 +11,7 @@ type TodoOutput struct {
 	ID          string
 	Title       string
 	Description string
+	DueDate     *time.Time
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
@@ -21,6 +22,7 @@ func TodoOutputFromDomain(todo domain.Todo) TodoOutput {
 		ID:          todo.ID,
 		Title:       todo.Title,
 		Description: todo.Description,
+		DueDate:     todo.DueDate,
 		CreatedAt:   todo.CreatedAt,
 		UpdatedAt:   todo.UpdatedAt,
 	}

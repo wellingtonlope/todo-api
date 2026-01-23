@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/wellingtonlope/todo-api/internal/app/usecase"
 	"github.com/wellingtonlope/todo-api/internal/domain"
@@ -16,6 +17,7 @@ type (
 		ID          string
 		Title       string
 		Description string
+		DueDate     *time.Time
 	}
 	UpdateStore interface {
 		GetByID(ctx context.Context, id string) (domain.Todo, error)
@@ -48,7 +50,7 @@ func (uc *update) Handle(ctx context.Context, input UpdateInput) (TodoOutput, er
 			err, usecase.ErrorTypeInternalError)
 
 	}
-	todo, err = todo.Update(input.Title, input.Description, uc.clock.Now())
+	todo, err = todo.Update(input.Title, input.Description, uc.clock.Now(), input.DueDate)
 	if err != nil {
 		return TodoOutput{}, usecase.NewError(err.Error(), err, usecase.ErrorTypeBadRequest)
 	}

@@ -2,6 +2,7 @@ package todo
 
 import (
 	"context"
+	"time"
 
 	"github.com/wellingtonlope/todo-api/internal/app/usecase"
 	"github.com/wellingtonlope/todo-api/internal/domain"
@@ -11,6 +12,7 @@ type (
 	CreateInput struct {
 		Title       string
 		Description string
+		DueDate     *time.Time
 	}
 	CreateStore interface {
 		Create(ctx context.Context, todo domain.Todo) (domain.Todo, error)
@@ -32,7 +34,7 @@ func NewCreate(store CreateStore, clock usecase.Clock) *create {
 }
 
 func (uc *create) Handle(ctx context.Context, input CreateInput) (TodoOutput, error) {
-	todo, err := domain.NewTodo(input.Title, input.Description, uc.clock.Now())
+	todo, err := domain.NewTodo(input.Title, input.Description, uc.clock.Now(), input.DueDate)
 	if err != nil {
 		return TodoOutput{}, usecase.NewError(err.Error(), err, usecase.ErrorTypeBadRequest)
 	}

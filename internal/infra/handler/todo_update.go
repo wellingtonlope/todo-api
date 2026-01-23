@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/wellingtonlope/todo-api/internal/app/usecase"
@@ -10,8 +11,9 @@ import (
 
 type (
 	todoUpdateInput struct {
-		Title       string `json:"title"`
-		Description string `json:"description"`
+		Title       string     `json:"title"`
+		Description string     `json:"description"`
+		DueDate     *time.Time `json:"due_date,omitempty"`
 	}
 	TodoUpdate struct {
 		update todo.Update
@@ -43,6 +45,7 @@ func (h *TodoUpdate) Handle(c echo.Context) error {
 		ID:          id,
 		Title:       input.Title,
 		Description: input.Description,
+		DueDate:     input.DueDate,
 	})
 	if err != nil {
 		return err

@@ -18,11 +18,12 @@ type ErrorResponse struct {
 }
 
 type todoOutput struct {
-	ID          string    `json:"id"`
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	ID          string     `json:"id"`
+	Title       string     `json:"title"`
+	Description string     `json:"description"`
+	DueDate     *time.Time `json:"due_date,omitempty"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
 }
 
 // todoOutputFromUsecase converts a usecase TodoOutput to handler todoOutput
@@ -31,6 +32,7 @@ func todoOutputFromUsecase(usecaseOutput todo.TodoOutput) todoOutput {
 		ID:          usecaseOutput.ID,
 		Title:       usecaseOutput.Title,
 		Description: usecaseOutput.Description,
+		DueDate:     usecaseOutput.DueDate,
 		CreatedAt:   usecaseOutput.CreatedAt,
 		UpdatedAt:   usecaseOutput.UpdatedAt,
 	}
