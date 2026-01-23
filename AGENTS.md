@@ -134,6 +134,10 @@ Run `make format` (gofumpt) before committing. Gofumpt is stricter than gofmt: n
 
 Run `make lint` (golangci-lint) before committing.
 
+### Language
+
+All code and documentation must be written in English.
+
 ### Testing Guidelines
 
 - Use `github.com/stretchr/testify/assert` and `github.com/stretchr/testify/mock`
