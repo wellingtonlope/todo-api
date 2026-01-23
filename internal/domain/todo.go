@@ -9,10 +9,18 @@ import (
 
 var ErrTodoInvalidInput = errors.New("todo invalid input")
 
+type TodoStatus string
+
+const (
+	TodoStatusPending   TodoStatus = "pending"
+	TodoStatusCompleted TodoStatus = "completed"
+)
+
 type Todo struct {
 	ID          string
 	Title       string
 	Description string
+	Status      TodoStatus
 	DueDate     *time.Time
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
@@ -33,6 +41,7 @@ func NewTodo(title, description string, date time.Time, dueDate *time.Time) (Tod
 	return Todo{
 		Title:       title,
 		Description: description,
+		Status:      TodoStatusPending,
 		DueDate:     dueDate,
 		CreatedAt:   date,
 		UpdatedAt:   date,
@@ -56,4 +65,16 @@ func (t Todo) Update(title, description string, date time.Time, dueDate *time.Ti
 	t.DueDate = dueDate
 	t.UpdatedAt = date
 	return t, nil
+}
+
+func (t Todo) MarkAsCompleted(date time.Time) Todo {
+	t.Status = TodoStatusCompleted
+	t.UpdatedAt = date
+	return t
+}
+
+func (t Todo) MarkAsPending(date time.Time) Todo {
+	t.Status = TodoStatusPending
+	t.UpdatedAt = date
+	return t
 }

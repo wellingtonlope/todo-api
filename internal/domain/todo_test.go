@@ -16,6 +16,7 @@ func TestNewTodo(t *testing.T) {
 	exampleTodo := domain.Todo{
 		Title:       exampleTitle,
 		Description: exampleDescription,
+		Status:      domain.TodoStatusPending,
 		DueDate:     nil,
 		CreatedAt:   exampleDate,
 		UpdatedAt:   exampleDate,
@@ -94,6 +95,7 @@ func TestTodo_Update(t *testing.T) {
 	exampleTodo := domain.Todo{
 		Title:       exampleTitle,
 		Description: exampleDescription,
+		Status:      domain.TodoStatusPending,
 		DueDate:     nil,
 		CreatedAt:   exampleDate,
 		UpdatedAt:   exampleDate,
@@ -101,6 +103,7 @@ func TestTodo_Update(t *testing.T) {
 	exampleTodoUpdated := domain.Todo{
 		Title:       exampleTitleUpdated,
 		Description: exampleDescriptionUpdated,
+		Status:      domain.TodoStatusPending,
 		DueDate:     nil,
 		CreatedAt:   exampleDate,
 		UpdatedAt:   exampleDateUpdated,
@@ -171,6 +174,90 @@ func TestTodo_Update(t *testing.T) {
 			result, err := tc.todo.Update(tc.title, tc.description, tc.date, tc.dueDate)
 			assert.Equal(t, tc.result, result)
 			assert.Equal(t, tc.err, err)
+		})
+	}
+}
+
+func TestTodo_MarkAsCompleted(t *testing.T) {
+	exampleTitle := "title example"
+	exampleDescription := "description example"
+	exampleDate, _ := time.Parse(time.DateOnly, "2024-01-01")
+	exampleDateUpdated, _ := time.Parse(time.DateOnly, "2024-01-02")
+	exampleTodo := domain.Todo{
+		Title:       exampleTitle,
+		Description: exampleDescription,
+		Status:      domain.TodoStatusPending,
+		DueDate:     nil,
+		CreatedAt:   exampleDate,
+		UpdatedAt:   exampleDate,
+	}
+	exampleTodoCompleted := domain.Todo{
+		Title:       exampleTitle,
+		Description: exampleDescription,
+		Status:      domain.TodoStatusCompleted,
+		DueDate:     nil,
+		CreatedAt:   exampleDate,
+		UpdatedAt:   exampleDateUpdated,
+	}
+	testCases := []struct {
+		name   string
+		todo   domain.Todo
+		date   time.Time
+		result domain.Todo
+	}{
+		{
+			name:   "should mark todo as completed",
+			todo:   exampleTodo,
+			date:   exampleDateUpdated,
+			result: exampleTodoCompleted,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := tc.todo.MarkAsCompleted(tc.date)
+			assert.Equal(t, tc.result, result)
+		})
+	}
+}
+
+func TestTodo_MarkAsPending(t *testing.T) {
+	exampleTitle := "title example"
+	exampleDescription := "description example"
+	exampleDate, _ := time.Parse(time.DateOnly, "2024-01-01")
+	exampleDateUpdated, _ := time.Parse(time.DateOnly, "2024-01-02")
+	exampleTodo := domain.Todo{
+		Title:       exampleTitle,
+		Description: exampleDescription,
+		Status:      domain.TodoStatusCompleted,
+		DueDate:     nil,
+		CreatedAt:   exampleDate,
+		UpdatedAt:   exampleDate,
+	}
+	exampleTodoPending := domain.Todo{
+		Title:       exampleTitle,
+		Description: exampleDescription,
+		Status:      domain.TodoStatusPending,
+		DueDate:     nil,
+		CreatedAt:   exampleDate,
+		UpdatedAt:   exampleDateUpdated,
+	}
+	testCases := []struct {
+		name   string
+		todo   domain.Todo
+		date   time.Time
+		result domain.Todo
+	}{
+		{
+			name:   "should mark todo as pending",
+			todo:   exampleTodo,
+			date:   exampleDateUpdated,
+			result: exampleTodoPending,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := tc.todo.MarkAsPending(tc.date)
+			assert.Equal(t, tc.result, result)
 		})
 	}
 }

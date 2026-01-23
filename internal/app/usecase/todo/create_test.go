@@ -48,6 +48,7 @@ func TestCreate_Handle(t *testing.T) {
 				m.On("Create", context.TODO(), domain.Todo{
 					Title:       "example title",
 					Description: "example description",
+					Status:      domain.TodoStatusPending,
 					CreatedAt:   exampleDate,
 					UpdatedAt:   exampleDate,
 				}).Return(domain.Todo{}, assert.AnError).Once()
@@ -74,12 +75,14 @@ func TestCreate_Handle(t *testing.T) {
 				m.On("Create", context.TODO(), domain.Todo{
 					Title:       "example title",
 					Description: "example description",
+					Status:      domain.TodoStatusPending,
 					CreatedAt:   exampleDate,
 					UpdatedAt:   exampleDate,
 				}).Return(domain.Todo{
 					ID:          "123",
 					Title:       "example title",
 					Description: "example description",
+					Status:      domain.TodoStatusPending,
 					CreatedAt:   exampleDate,
 					UpdatedAt:   exampleDate,
 				}, nil).Once()
@@ -99,6 +102,7 @@ func TestCreate_Handle(t *testing.T) {
 				ID:          "123",
 				Title:       "example title",
 				Description: "example description",
+				Status:      "pending",
 				CreatedAt:   exampleDate,
 				UpdatedAt:   exampleDate,
 			},

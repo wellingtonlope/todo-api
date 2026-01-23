@@ -24,6 +24,8 @@ definitions:
         type: string
       id:
         type: string
+      status:
+        type: string
       title:
         type: string
       updated_at:
@@ -158,6 +160,56 @@ paths:
           schema:
             $ref: '#/definitions/handler.ErrorResponse'
       summary: Update a todo
+      tags:
+      - todos
+  /todos/{id}/complete:
+    post:
+      consumes:
+      - application/json
+      description: Mark an existing todo item as completed
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.todoOutput'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Mark a todo as completed
+      tags:
+      - todos
+  /todos/{id}/pending:
+    post:
+      consumes:
+      - application/json
+      description: Mark an existing todo item as pending
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.todoOutput'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Mark a todo as pending
       tags:
       - todos
 swagger: "2.0"

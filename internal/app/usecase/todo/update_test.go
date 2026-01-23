@@ -72,6 +72,7 @@ func TestUpdate_Handle(t *testing.T) {
 						ID:          "123",
 						Title:       "example title",
 						Description: "example description",
+						Status:      domain.TodoStatusPending,
 						CreatedAt:   exampleDate,
 						UpdatedAt:   exampleDate,
 					}, nil).Once()
@@ -101,12 +102,14 @@ func TestUpdate_Handle(t *testing.T) {
 						ID:          "123",
 						Title:       "example title",
 						Description: "example description",
+						Status:      domain.TodoStatusPending,
 						CreatedAt:   exampleDate,
 						UpdatedAt:   exampleDate,
 					}, nil).Once()
 				m.On("Update", context.TODO(), domain.Todo{
 					ID:          "123",
 					Title:       "example title updated",
+					Status:      domain.TodoStatusPending,
 					Description: "example description updated",
 					CreatedAt:   exampleDate,
 					UpdatedAt:   exampleDateUpdated,
@@ -137,6 +140,7 @@ func TestUpdate_Handle(t *testing.T) {
 						ID:          "123",
 						Title:       "example title",
 						Description: "example description",
+						Status:      domain.TodoStatusPending,
 						CreatedAt:   exampleDate,
 						UpdatedAt:   exampleDate,
 					}, nil).Once()
@@ -144,6 +148,7 @@ func TestUpdate_Handle(t *testing.T) {
 					ID:          "123",
 					Title:       "example title updated",
 					Description: "example description updated",
+					Status:      domain.TodoStatusPending,
 					CreatedAt:   exampleDate,
 					UpdatedAt:   exampleDateUpdated,
 				}).Return(domain.Todo{}, assert.AnError).Once()
@@ -173,6 +178,7 @@ func TestUpdate_Handle(t *testing.T) {
 						ID:          "123",
 						Title:       "example title",
 						Description: "example description",
+						Status:      domain.TodoStatusPending,
 						CreatedAt:   exampleDate,
 						UpdatedAt:   exampleDate,
 					}, nil).Once()
@@ -180,12 +186,14 @@ func TestUpdate_Handle(t *testing.T) {
 					ID:          "123",
 					Title:       "example title updated",
 					Description: "example description updated",
+					Status:      domain.TodoStatusPending,
 					CreatedAt:   exampleDate,
 					UpdatedAt:   exampleDateUpdated,
 				}).Return(domain.Todo{
 					ID:          "123",
 					Title:       "example title updated",
 					Description: "example description updated",
+					Status:      domain.TodoStatusPending,
 					CreatedAt:   exampleDate,
 					UpdatedAt:   exampleDateUpdated,
 				}, nil).Once()
@@ -206,6 +214,7 @@ func TestUpdate_Handle(t *testing.T) {
 				ID:          "123",
 				Title:       "example title updated",
 				Description: "example description updated",
+				Status:      "pending",
 				CreatedAt:   exampleDate,
 				UpdatedAt:   exampleDateUpdated,
 			},

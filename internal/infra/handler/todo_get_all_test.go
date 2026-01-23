@@ -45,13 +45,14 @@ func TestTodoGetAll_Handle(t *testing.T) {
 						ID:          "123",
 						Title:       "example title",
 						Description: "example description",
+						Status:      "pending",
 						CreatedAt:   exampleDate,
 						UpdatedAt:   exampleDate,
 					},
 				}, nil).Once()
 				return m
 			}(),
-			responseBody:   `[{"id":"123","title":"example title","description":"example description","created_at":"2024-01-01T00:00:00Z","updated_at":"2024-01-01T00:00:00Z"}]`,
+			responseBody:   `[{"id":"123","title":"example title","description":"example description","status":"pending","created_at":"2024-01-01T00:00:00Z","updated_at":"2024-01-01T00:00:00Z"}]`,
 			responseStatus: http.StatusOK,
 			err:            nil,
 		},
