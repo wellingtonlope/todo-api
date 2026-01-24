@@ -207,21 +207,3 @@ func TestTodoUpdateBDD(t *testing.T) {
 
 	runBDDTest(t, app, db, []string{"features/todo_update.feature"}, tc.InitializeScenario)
 }
-<<<<<<< HEAD
-
-func TestTodoCompleteBDD(t *testing.T) {
-	db := setupDatabase(t)
-	deps := setupDependencies(db)
-	app := setupEchoApp(deps, true, false, false) // true for include GetByID, false for no GetAll, false for no Update
-
-	tc := &steps.TodoCompleteContext{
-		BaseTestContext: steps.BaseTestContext{
-			EchoApp: app,
-			DB:      db,
-		},
-	}
-
-	runBDDTest(t, app, db, []string{"features/todo_complete.feature"}, tc.InitializeScenario)
-}
-=======
->>>>>>> origin/main
