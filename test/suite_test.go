@@ -17,13 +17,15 @@ import (
 )
 
 type TestDependencies struct {
-	DB             *gorm.DB
-	Clock          usecase.Clock
-	Store          interface{}
-	CreateUsecase  todo.Create
-	GetByIDUsecase todo.GetByID
-	CreateHandler  *handler.TodoCreate
-	GetByIDHandler *handler.TodoGetByID
+	DB                *gorm.DB
+	Clock             usecase.Clock
+	Store             interface{}
+	CreateUsecase     todo.Create
+	GetByIDUsecase    todo.GetByID
+	DeleteByIDUsecase todo.DeleteByID
+	CreateHandler     *handler.TodoCreate
+	GetByIDHandler    *handler.TodoGetByID
+	DeleteByIDHandler *handler.TodoDeleteByID
 }
 
 func setupDatabase(t *testing.T) *gorm.DB {
@@ -43,17 +45,21 @@ func setupDependencies(db *gorm.DB) *TestDependencies {
 	store := memory.NewTodoRepository()
 	createUsecase := todo.NewCreate(store, clock)
 	getByIDUsecase := todo.NewGetByID(store)
+	deleteByIDUsecase := todo.NewDeleteByID(store)
 	createHandler := handler.NewTodoCreate(createUsecase)
 	getByIDHandler := handler.NewTodoGetByID(getByIDUsecase)
+	deleteByIDHandler := handler.NewTodoDeleteByID(deleteByIDUsecase)
 
 	return &TestDependencies{
-		DB:             db,
-		Clock:          clock,
-		Store:          store,
-		CreateUsecase:  createUsecase,
-		GetByIDUsecase: getByIDUsecase,
-		CreateHandler:  createHandler,
-		GetByIDHandler: getByIDHandler,
+		DB:                db,
+		Clock:             clock,
+		Store:             store,
+		CreateUsecase:     createUsecase,
+		GetByIDUsecase:    getByIDUsecase,
+		DeleteByIDUsecase: deleteByIDUsecase,
+		CreateHandler:     createHandler,
+		GetByIDHandler:    getByIDHandler,
+		DeleteByIDHandler: deleteByIDHandler,
 	}
 }
 
@@ -64,6 +70,7 @@ func setupEchoApp(deps *TestDependencies, includeGetByID bool) *echo.Echo {
 	if includeGetByID {
 		e.GET("/todos/:id", deps.GetByIDHandler.Handle)
 	}
+	e.DELETE("/todos/:id", deps.DeleteByIDHandler.Handle)
 	return e
 }
 
@@ -110,4 +117,19 @@ func TestTodoGetByIDBDD(t *testing.T) {
 	}
 
 	runBDDTest(t, app, db, []string{"features/todo_get_by_id.feature"}, tc.InitializeScenario)
+}
+
+func TestTodoDeleteByIDBDD(t *testing.T) {
+	db := setupDatabase(t)
+	deps := setupDependencies(db)
+	app := setupEchoApp(deps, true) // true for include GetByID and DeleteByID
+
+	tc := &steps.TodoDeleteByIDContext{
+		BaseTestContext: steps.BaseTestContext{
+			EchoApp: app,
+			DB:      db,
+		},
+	}
+
+	runBDDTest(t, app, db, []string{"features/todo_delete_by_id.feature"}, tc.InitializeScenario)
 }

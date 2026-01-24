@@ -50,8 +50,12 @@ func (r *todoRepository) GetByID(ctx context.Context, id string) (domain.Todo, e
 }
 
 func (r *todoRepository) DeleteByID(ctx context.Context, id string) error {
-	if err := r.db.WithContext(ctx).Delete(&TodoModel{}, "id = ?", id).Error; err != nil {
-		return err
+	result := r.db.WithContext(ctx).Delete(&TodoModel{}, "id = ?", id)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return todoUC.ErrDeleteByIDStoreNotFound
 	}
 	return nil
 }

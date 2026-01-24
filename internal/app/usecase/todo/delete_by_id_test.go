@@ -28,7 +28,7 @@ func TestDeleteByID_Handle(t *testing.T) {
 			}(),
 			ctx: context.TODO(),
 			id:  "123",
-			err: usecase.NewError("fail to detele a todo by id", assert.AnError,
+			err: usecase.NewError("fail to delete a todo by id", assert.AnError,
 				usecase.ErrorTypeInternalError),
 		},
 		{

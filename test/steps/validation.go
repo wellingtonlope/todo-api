@@ -11,6 +11,7 @@ import (
 const (
 	StatusCreated    = 201
 	StatusOK         = 200
+	StatusNoContent  = 204
 	StatusBadRequest = 400
 	StatusNotFound   = 404
 	ContentTypeJSON  = "application/json"

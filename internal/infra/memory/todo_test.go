@@ -81,7 +81,7 @@ func TestDeleteByID(t *testing.T) {
 	assert.Len(t, repo.todos, 0)
 
 	err = repo.DeleteByID(context.Background(), "999") // non-existing
-	assert.Nil(t, err)                                 // Delete is idempotent, no error
+	assert.Equal(t, todoUC.ErrDeleteByIDStoreNotFound, err)
 }
 
 func TestUpdate(t *testing.T) {
