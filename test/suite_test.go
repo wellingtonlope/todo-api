@@ -17,19 +17,24 @@ import (
 )
 
 type TestDependencies struct {
-	DB                *gorm.DB
-	Clock             usecase.Clock
-	Store             interface{}
-	CreateUsecase     todo.Create
-	GetByIDUsecase    todo.GetByID
-	GetAllUsecase     todo.GetAll
-	DeleteByIDUsecase todo.DeleteByID
-	UpdateUsecase     todo.Update
-	CreateHandler     *handler.TodoCreate
-	GetByIDHandler    *handler.TodoGetByID
-	GetAllHandler     *handler.TodoGetAll
-	DeleteByIDHandler *handler.TodoDeleteByID
-	UpdateHandler     *handler.TodoUpdate
+	DB                 *gorm.DB
+	Clock              usecase.Clock
+	Store              interface{}
+	CreateUsecase      todo.Create
+	GetByIDUsecase     todo.GetByID
+	GetAllUsecase      todo.GetAll
+	DeleteByIDUsecase  todo.DeleteByID
+	UpdateUsecase      todo.Update
+	CompleteUsecase    todo.Complete
+	MarkPendingUsecase todo.MarkAsPending
+
+	CreateHandler      *handler.TodoCreate
+	GetByIDHandler     *handler.TodoGetByID
+	GetAllHandler      *handler.TodoGetAll
+	DeleteByIDHandler  *handler.TodoDeleteByID
+	UpdateHandler      *handler.TodoUpdate
+	CompleteHandler    *handler.TodoComplete
+	MarkPendingHandler *handler.TodoMarkPending
 }
 
 func (td *TestDependencies) ResetStore() {
@@ -41,11 +46,15 @@ func (td *TestDependencies) ResetStore() {
 	td.GetAllUsecase = todo.NewGetAll(store)
 	td.DeleteByIDUsecase = todo.NewDeleteByID(store)
 	td.UpdateUsecase = todo.NewUpdate(store, td.Clock)
+	td.CompleteUsecase = todo.NewComplete(store, td.Clock)
+	td.MarkPendingUsecase = todo.NewMarkAsPending(store, td.Clock)
 	td.CreateHandler = handler.NewTodoCreate(td.CreateUsecase)
 	td.GetByIDHandler = handler.NewTodoGetByID(td.GetByIDUsecase)
 	td.GetAllHandler = handler.NewTodoGetAll(td.GetAllUsecase)
 	td.DeleteByIDHandler = handler.NewTodoDeleteByID(td.DeleteByIDUsecase)
 	td.UpdateHandler = handler.NewTodoUpdate(td.UpdateUsecase)
+	td.CompleteHandler = handler.NewTodoComplete(td.CompleteUsecase)
+	td.MarkPendingHandler = handler.NewTodoMarkPending(td.MarkPendingUsecase)
 }
 
 func setupDatabase(t *testing.T) *gorm.DB {
@@ -68,30 +77,38 @@ func setupDependencies(db *gorm.DB) *TestDependencies {
 	getAllUsecase := todo.NewGetAll(store)
 	deleteByIDUsecase := todo.NewDeleteByID(store)
 	updateUsecase := todo.NewUpdate(store, clock)
+	completeUsecase := todo.NewComplete(store, clock)
+	markPendingUsecase := todo.NewMarkAsPending(store, clock)
 	createHandler := handler.NewTodoCreate(createUsecase)
 	getByIDHandler := handler.NewTodoGetByID(getByIDUsecase)
 	getAllHandler := handler.NewTodoGetAll(getAllUsecase)
 	deleteByIDHandler := handler.NewTodoDeleteByID(deleteByIDUsecase)
 	updateHandler := handler.NewTodoUpdate(updateUsecase)
+	completeHandler := handler.NewTodoComplete(completeUsecase)
+	markPendingHandler := handler.NewTodoMarkPending(markPendingUsecase)
 
 	return &TestDependencies{
-		DB:                db,
-		Clock:             clock,
-		Store:             store,
-		CreateUsecase:     createUsecase,
-		GetByIDUsecase:    getByIDUsecase,
-		GetAllUsecase:     getAllUsecase,
-		DeleteByIDUsecase: deleteByIDUsecase,
-		UpdateUsecase:     updateUsecase,
-		CreateHandler:     createHandler,
-		GetByIDHandler:    getByIDHandler,
-		GetAllHandler:     getAllHandler,
-		DeleteByIDHandler: deleteByIDHandler,
-		UpdateHandler:     updateHandler,
+		DB:                 db,
+		Clock:              clock,
+		Store:              store,
+		CreateUsecase:      createUsecase,
+		GetByIDUsecase:     getByIDUsecase,
+		GetAllUsecase:      getAllUsecase,
+		DeleteByIDUsecase:  deleteByIDUsecase,
+		UpdateUsecase:      updateUsecase,
+		CompleteUsecase:    completeUsecase,
+		MarkPendingUsecase: markPendingUsecase,
+		CreateHandler:      createHandler,
+		GetByIDHandler:     getByIDHandler,
+		GetAllHandler:      getAllHandler,
+		DeleteByIDHandler:  deleteByIDHandler,
+		UpdateHandler:      updateHandler,
+		CompleteHandler:    completeHandler,
+		MarkPendingHandler: markPendingHandler,
 	}
 }
 
-func setupEchoApp(deps *TestDependencies, includeGetByID, includeGetAll, includeUpdate, includeMarkPending bool) *echo.Echo {
+func setupEchoApp(deps *TestDependencies, includeGetByID, includeGetAll, includeUpdate, includeComplete, includeMarkPending bool) *echo.Echo {
 	e := echo.New()
 	e.Use(handler.Error)
 	e.POST("/todos", deps.CreateHandler.Handle)
@@ -104,6 +121,12 @@ func setupEchoApp(deps *TestDependencies, includeGetByID, includeGetAll, include
 	e.DELETE("/todos/:id", deps.DeleteByIDHandler.Handle)
 	if includeUpdate {
 		e.PUT("/todos/:id", deps.UpdateHandler.Handle)
+	}
+	if includeComplete {
+		e.POST("/todos/:id/complete", deps.CompleteHandler.Handle)
+	}
+	if includeMarkPending {
+		e.POST("/todos/:id/pending", deps.MarkPendingHandler.Handle)
 	}
 	return e
 }
@@ -126,7 +149,7 @@ func runBDDTest(t *testing.T, app *echo.Echo, db *gorm.DB, featurePaths []string
 func TestTodoCreationBDD(t *testing.T) {
 	db := setupDatabase(t)
 	deps := setupDependencies(db)
-	app := setupEchoApp(deps, false, false, false, false) // false for no GetByID, false for no GetAll, false for no Update
+	app := setupEchoApp(deps, false, false, false, false, false) // false for no GetByID, false for no GetAll, false for no Update, false for no Complete, false for no MarkPending
 
 	tc := &steps.TodoCreationContext{
 		BaseTestContext: steps.BaseTestContext{
@@ -141,7 +164,7 @@ func TestTodoCreationBDD(t *testing.T) {
 func TestTodoGetByIDBDD(t *testing.T) {
 	db := setupDatabase(t)
 	deps := setupDependencies(db)
-	app := setupEchoApp(deps, true, false, false, false) // true for include GetByID, false for no GetAll, false for no Update
+	app := setupEchoApp(deps, true, false, false, false, false) // true for include GetByID, false for no GetAll, false for no Update, false for no Complete, false for no MarkPending
 
 	tc := &steps.TodoGetByIDContext{
 		BaseTestContext: steps.BaseTestContext{
@@ -156,7 +179,7 @@ func TestTodoGetByIDBDD(t *testing.T) {
 func TestTodoDeleteByIDBDD(t *testing.T) {
 	db := setupDatabase(t)
 	deps := setupDependencies(db)
-	app := setupEchoApp(deps, true, false, false, false) // true for include GetByID, false for no GetAll, false for no Update
+	app := setupEchoApp(deps, true, false, false, false, false) // true for include GetByID, false for no GetAll, false for no Update, false for no Complete, false for no MarkPending
 
 	tc := &steps.TodoDeleteByIDContext{
 		BaseTestContext: steps.BaseTestContext{
@@ -171,7 +194,7 @@ func TestTodoDeleteByIDBDD(t *testing.T) {
 func TestTodoGetAllBDD(t *testing.T) {
 	db := setupDatabase(t)
 	deps := setupDependencies(db)
-	app := setupEchoApp(deps, false, true, false, false) // false for no GetByID, true for include GetAll, false for no Update
+	app := setupEchoApp(deps, false, true, false, false, false) // false for no GetByID, true for include GetAll, false for no Update, false for no Complete, false for no MarkPending
 
 	tc := &steps.TodoGetAllContext{
 		BaseTestContext: steps.BaseTestContext{
@@ -186,7 +209,7 @@ func TestTodoGetAllBDD(t *testing.T) {
 	// Update the ResetStoreFunc to also update the EchoApp after tc is created
 	tc.ResetStoreFunc = func() {
 		deps.ResetStore()
-		newApp := setupEchoApp(deps, false, true, false, false)
+		newApp := setupEchoApp(deps, false, true, false, false, false)
 		tc.EchoApp = newApp
 	}
 
@@ -196,7 +219,7 @@ func TestTodoGetAllBDD(t *testing.T) {
 func TestTodoUpdateBDD(t *testing.T) {
 	db := setupDatabase(t)
 	deps := setupDependencies(db)
-	app := setupEchoApp(deps, true, false, true, false) // true for include GetByID, false for no GetAll, true for Update
+	app := setupEchoApp(deps, true, false, true, false, false) // true for include GetByID, false for no GetAll, true for Update, false for no Complete, false for no MarkPending
 
 	tc := &steps.TodoUpdateContext{
 		BaseTestContext: steps.BaseTestContext{
@@ -208,10 +231,25 @@ func TestTodoUpdateBDD(t *testing.T) {
 	runBDDTest(t, app, db, []string{"features/todo_update.feature"}, tc.InitializeScenario)
 }
 
+func TestTodoCompleteBDD(t *testing.T) {
+	db := setupDatabase(t)
+	deps := setupDependencies(db)
+	app := setupEchoApp(deps, true, false, false, true, false) // true for include GetByID, false for no GetAll, false for no Update, true for Complete, false for no MarkPending
+
+	tc := &steps.TodoCompleteContext{
+		BaseTestContext: steps.BaseTestContext{
+			EchoApp: app,
+			DB:      db,
+		},
+	}
+
+	runBDDTest(t, app, db, []string{"features/todo_complete.feature"}, tc.InitializeScenario)
+}
+
 func TestTodoMarkPendingBDD(t *testing.T) {
 	db := setupDatabase(t)
 	deps := setupDependencies(db)
-	app := setupEchoApp(deps, true, false, false, true) // true for include GetByID, false for no GetAll, false for no Update, true for MarkPending
+	app := setupEchoApp(deps, true, false, false, false, true) // true for include GetByID, false for no GetAll, false for no Update, false for no Complete, true for MarkPending
 
 	tc := &steps.TodoMarkPendingContext{
 		BaseTestContext: steps.BaseTestContext{
