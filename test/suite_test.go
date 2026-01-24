@@ -207,6 +207,7 @@ func TestTodoUpdateBDD(t *testing.T) {
 
 	runBDDTest(t, app, db, []string{"features/todo_update.feature"}, tc.InitializeScenario)
 }
+<<<<<<< HEAD
 
 func TestTodoCompleteBDD(t *testing.T) {
 	db := setupDatabase(t)
@@ -222,3 +223,5 @@ func TestTodoCompleteBDD(t *testing.T) {
 
 	runBDDTest(t, app, db, []string{"features/todo_complete.feature"}, tc.InitializeScenario)
 }
+=======
+>>>>>>> origin/main
