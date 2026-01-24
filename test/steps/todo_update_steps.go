@@ -142,19 +142,6 @@ func (tc *TodoUpdateContext) TheUpdateShouldFailWithValidationError() error {
 	return validateErrorResponse(tc.Response, StatusBadRequest, "invalid input")
 }
 
-func (tc *TodoUpdateContext) iUpdateTheTodoWithIDFromTheCreatedTodoWithTitleDescriptionAndDue_date(title, desc, dueDate string) error {
-	tc.UpdateInput = map[string]interface{}{
-		"title": title,
-	}
-	if desc != "" {
-		tc.UpdateInput["description"] = desc
-	}
-	if dueDate != "" {
-		tc.UpdateInput["due_date"] = dueDate
-	}
-	return tc.IUpdateTheTodoWithIDFromTheCreatedTodo()
-}
-
 func (tc *TodoUpdateContext) InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Step(`^the database is reset$`, tc.ResetDatabase)
 	ctx.Step(`^I have created a todo with title "([^"]*)", description "([^"]*)" and due_date "([^"]*)"$`, tc.IHaveCreatedATodoForUpdate)

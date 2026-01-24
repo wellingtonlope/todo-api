@@ -16,6 +16,50 @@ import (
 	"gorm.io/gorm"
 )
 
+// FeatureType represents the type of BDD test feature
+type FeatureType int
+
+const (
+	FeatureCreation FeatureType = iota
+	FeatureGetByID
+	FeatureGetAll
+	FeatureDeleteByID
+	FeatureUpdate
+	FeatureComplete
+	FeatureMarkPending
+)
+
+// FeatureFlags defines which endpoints to include in the Echo app
+type FeatureFlags struct {
+	IncludeGetByID     bool
+	IncludeGetAll      bool
+	IncludeUpdate      bool
+	IncludeComplete    bool
+	IncludeMarkPending bool
+}
+
+// GetFeatureFlags returns the appropriate feature flags for a given feature type
+func GetFeatureFlags(featureType FeatureType) FeatureFlags {
+	switch featureType {
+	case FeatureCreation:
+		return FeatureFlags{}
+	case FeatureGetByID:
+		return FeatureFlags{IncludeGetByID: true}
+	case FeatureGetAll:
+		return FeatureFlags{IncludeGetAll: true}
+	case FeatureDeleteByID:
+		return FeatureFlags{IncludeGetByID: true}
+	case FeatureUpdate:
+		return FeatureFlags{IncludeGetByID: true, IncludeUpdate: true}
+	case FeatureComplete:
+		return FeatureFlags{IncludeGetByID: true, IncludeComplete: true}
+	case FeatureMarkPending:
+		return FeatureFlags{IncludeGetByID: true, IncludeMarkPending: true}
+	default:
+		return FeatureFlags{}
+	}
+}
+
 type TestDependencies struct {
 	DB                 *gorm.DB
 	Clock              usecase.Clock
@@ -35,6 +79,29 @@ type TestDependencies struct {
 	UpdateHandler      *handler.TodoUpdate
 	CompleteHandler    *handler.TodoComplete
 	MarkPendingHandler *handler.TodoMarkPending
+}
+
+// TestFactory handles test setup and reduces duplication
+type TestFactory struct {
+	t *testing.T
+}
+
+// NewTestFactory creates a new test factory
+func NewTestFactory(t *testing.T) *TestFactory {
+	return &TestFactory{t: t}
+}
+
+// SetupBDDTest returns configured dependencies for a given feature type
+func (tf *TestFactory) SetupBDDTest(featureType FeatureType) (*TestDependencies, *echo.Echo) {
+	db := tf.setupDatabase()
+	deps := tf.setupDependencies(db)
+	app := tf.setupEchoApp(deps, GetFeatureFlags(featureType))
+	return deps, app
+}
+
+// Reset clears the state between tests
+func (tf *TestFactory) Reset(deps *TestDependencies) {
+	deps.ResetStore()
 }
 
 func (td *TestDependencies) ResetStore() {
@@ -57,19 +124,32 @@ func (td *TestDependencies) ResetStore() {
 	td.MarkPendingHandler = handler.NewTodoMarkPending(td.MarkPendingUsecase)
 }
 
-func setupDatabase(t *testing.T) *gorm.DB {
+// Reset clears all state including database and store
+func (td *TestDependencies) Reset() error {
+	// Clear database
+	if err := td.DB.Exec("DELETE FROM todos").Error; err != nil {
+		return err
+	}
+	// Reset store
+	td.ResetStore()
+	return nil
+}
+
+// setupDatabase creates and migrates an in-memory database
+func (tf *TestFactory) setupDatabase() *gorm.DB {
 	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 	if err != nil {
-		t.Fatal(err)
+		tf.t.Fatal(err)
 	}
 	err = db.AutoMigrate(&domain.Todo{})
 	if err != nil {
-		t.Fatal(err)
+		tf.t.Fatal(err)
 	}
 	return db
 }
 
-func setupDependencies(db *gorm.DB) *TestDependencies {
+// setupDependencies creates all use cases and handlers
+func (tf *TestFactory) setupDependencies(db *gorm.DB) *TestDependencies {
 	clock := clock.NewClientUTC()
 	store := memory.NewTodoRepository()
 	createUsecase := todo.NewCreate(store, clock)
@@ -108,24 +188,25 @@ func setupDependencies(db *gorm.DB) *TestDependencies {
 	}
 }
 
-func setupEchoApp(deps *TestDependencies, includeGetByID, includeGetAll, includeUpdate, includeComplete, includeMarkPending bool) *echo.Echo {
+// setupEchoApp configures the Echo app with the given feature flags
+func (tf *TestFactory) setupEchoApp(deps *TestDependencies, flags FeatureFlags) *echo.Echo {
 	e := echo.New()
 	e.Use(handler.Error)
 	e.POST("/todos", deps.CreateHandler.Handle)
-	if includeGetAll {
+	if flags.IncludeGetAll {
 		e.GET("/todos", deps.GetAllHandler.Handle)
 	}
-	if includeGetByID {
+	if flags.IncludeGetByID {
 		e.GET("/todos/:id", deps.GetByIDHandler.Handle)
 	}
 	e.DELETE("/todos/:id", deps.DeleteByIDHandler.Handle)
-	if includeUpdate {
+	if flags.IncludeUpdate {
 		e.PUT("/todos/:id", deps.UpdateHandler.Handle)
 	}
-	if includeComplete {
+	if flags.IncludeComplete {
 		e.POST("/todos/:id/complete", deps.CompleteHandler.Handle)
 	}
-	if includeMarkPending {
+	if flags.IncludeMarkPending {
 		e.POST("/todos/:id/pending", deps.MarkPendingHandler.Handle)
 	}
 	return e
@@ -147,116 +228,106 @@ func runBDDTest(t *testing.T, app *echo.Echo, db *gorm.DB, featurePaths []string
 }
 
 func TestTodoCreationBDD(t *testing.T) {
-	db := setupDatabase(t)
-	deps := setupDependencies(db)
-	app := setupEchoApp(deps, false, false, false, false, false) // false for no GetByID, false for no GetAll, false for no Update, false for no Complete, false for no MarkPending
+	factory := NewTestFactory(t)
+	deps, app := factory.SetupBDDTest(FeatureCreation)
 
 	tc := &steps.TodoCreationContext{
 		BaseTestContext: steps.BaseTestContext{
 			EchoApp: app,
-			DB:      db,
+			DB:      deps.DB,
 		},
 	}
 
-	runBDDTest(t, app, db, []string{"features/todo_creation.feature"}, tc.InitializeScenario)
+	runBDDTest(t, app, deps.DB, []string{"features/todo_creation.feature"}, tc.InitializeScenario)
 }
 
 func TestTodoGetByIDBDD(t *testing.T) {
-	db := setupDatabase(t)
-	deps := setupDependencies(db)
-	app := setupEchoApp(deps, true, false, false, false, false) // true for include GetByID, false for no GetAll, false for no Update, false for no Complete, false for no MarkPending
+	factory := NewTestFactory(t)
+	deps, app := factory.SetupBDDTest(FeatureGetByID)
 
 	tc := &steps.TodoGetByIDContext{
 		BaseTestContext: steps.BaseTestContext{
 			EchoApp: app,
-			DB:      db,
+			DB:      deps.DB,
 		},
 	}
 
-	runBDDTest(t, app, db, []string{"features/todo_get_by_id.feature"}, tc.InitializeScenario)
+	runBDDTest(t, app, deps.DB, []string{"features/todo_get_by_id.feature"}, tc.InitializeScenario)
 }
 
 func TestTodoDeleteByIDBDD(t *testing.T) {
-	db := setupDatabase(t)
-	deps := setupDependencies(db)
-	app := setupEchoApp(deps, true, false, false, false, false) // true for include GetByID, false for no GetAll, false for no Update, false for no Complete, false for no MarkPending
+	factory := NewTestFactory(t)
+	deps, app := factory.SetupBDDTest(FeatureDeleteByID)
 
 	tc := &steps.TodoDeleteByIDContext{
 		BaseTestContext: steps.BaseTestContext{
 			EchoApp: app,
-			DB:      db,
+			DB:      deps.DB,
 		},
 	}
 
-	runBDDTest(t, app, db, []string{"features/todo_delete_by_id.feature"}, tc.InitializeScenario)
+	runBDDTest(t, app, deps.DB, []string{"features/todo_delete_by_id.feature"}, tc.InitializeScenario)
 }
 
 func TestTodoGetAllBDD(t *testing.T) {
-	db := setupDatabase(t)
-	deps := setupDependencies(db)
-	app := setupEchoApp(deps, false, true, false, false, false) // false for no GetByID, true for include GetAll, false for no Update, false for no Complete, false for no MarkPending
+	factory := NewTestFactory(t)
+	deps, app := factory.SetupBDDTest(FeatureGetAll)
 
 	tc := &steps.TodoGetAllContext{
 		BaseTestContext: steps.BaseTestContext{
 			EchoApp: app,
-			DB:      db,
-		},
-		ResetStoreFunc: func() {
-			deps.ResetStore()
+			DB:      deps.DB,
 		},
 	}
 
-	// Update the ResetStoreFunc to also update the EchoApp after tc is created
+	// Set up the ResetStoreFunc with proper closure
 	tc.ResetStoreFunc = func() {
-		deps.ResetStore()
-		newApp := setupEchoApp(deps, false, true, false, false, false)
+		factory.Reset(deps)
+		newApp := factory.setupEchoApp(deps, GetFeatureFlags(FeatureGetAll))
 		tc.EchoApp = newApp
 	}
 
-	runBDDTest(t, app, db, []string{"features/todo_get_all.feature"}, tc.InitializeScenario)
+	runBDDTest(t, app, deps.DB, []string{"features/todo_get_all.feature"}, tc.InitializeScenario)
 }
 
 func TestTodoUpdateBDD(t *testing.T) {
-	db := setupDatabase(t)
-	deps := setupDependencies(db)
-	app := setupEchoApp(deps, true, false, true, false, false) // true for include GetByID, false for no GetAll, true for Update, false for no Complete, false for no MarkPending
+	factory := NewTestFactory(t)
+	deps, app := factory.SetupBDDTest(FeatureUpdate)
 
 	tc := &steps.TodoUpdateContext{
 		BaseTestContext: steps.BaseTestContext{
 			EchoApp: app,
-			DB:      db,
+			DB:      deps.DB,
 		},
 	}
 
-	runBDDTest(t, app, db, []string{"features/todo_update.feature"}, tc.InitializeScenario)
+	runBDDTest(t, app, deps.DB, []string{"features/todo_update.feature"}, tc.InitializeScenario)
 }
 
 func TestTodoCompleteBDD(t *testing.T) {
-	db := setupDatabase(t)
-	deps := setupDependencies(db)
-	app := setupEchoApp(deps, true, false, false, true, false) // true for include GetByID, false for no GetAll, false for no Update, true for Complete, false for no MarkPending
+	factory := NewTestFactory(t)
+	deps, app := factory.SetupBDDTest(FeatureComplete)
 
 	tc := &steps.TodoCompleteContext{
 		BaseTestContext: steps.BaseTestContext{
 			EchoApp: app,
-			DB:      db,
+			DB:      deps.DB,
 		},
 	}
 
-	runBDDTest(t, app, db, []string{"features/todo_complete.feature"}, tc.InitializeScenario)
+	runBDDTest(t, app, deps.DB, []string{"features/todo_complete.feature"}, tc.InitializeScenario)
 }
 
 func TestTodoMarkPendingBDD(t *testing.T) {
-	db := setupDatabase(t)
-	deps := setupDependencies(db)
-	app := setupEchoApp(deps, true, false, false, false, true) // true for include GetByID, false for no GetAll, false for no Update, false for no Complete, true for MarkPending
+	factory := NewTestFactory(t)
+	deps, app := factory.SetupBDDTest(FeatureMarkPending)
 
 	tc := &steps.TodoMarkPendingContext{
 		BaseTestContext: steps.BaseTestContext{
 			EchoApp: app,
-			DB:      db,
+			DB:      deps.DB,
 		},
 	}
 
-	runBDDTest(t, app, db, []string{"features/todo_mark_pending.feature"}, tc.InitializeScenario)
+	runBDDTest(t, app, deps.DB, []string{"features/todo_mark_pending.feature"}, tc.InitializeScenario)
 }
