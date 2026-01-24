@@ -23,9 +23,11 @@ type TestDependencies struct {
 	CreateUsecase     todo.Create
 	GetByIDUsecase    todo.GetByID
 	DeleteByIDUsecase todo.DeleteByID
+	CompleteUsecase   todo.Complete
 	CreateHandler     *handler.TodoCreate
 	GetByIDHandler    *handler.TodoGetByID
 	DeleteByIDHandler *handler.TodoDeleteByID
+	CompleteHandler   *handler.TodoComplete
 }
 
 func setupDatabase(t *testing.T) *gorm.DB {
@@ -46,9 +48,11 @@ func setupDependencies(db *gorm.DB) *TestDependencies {
 	createUsecase := todo.NewCreate(store, clock)
 	getByIDUsecase := todo.NewGetByID(store)
 	deleteByIDUsecase := todo.NewDeleteByID(store)
+	completeUsecase := todo.NewComplete(store, clock)
 	createHandler := handler.NewTodoCreate(createUsecase)
 	getByIDHandler := handler.NewTodoGetByID(getByIDUsecase)
 	deleteByIDHandler := handler.NewTodoDeleteByID(deleteByIDUsecase)
+	completeHandler := handler.NewTodoComplete(completeUsecase)
 
 	return &TestDependencies{
 		DB:                db,
@@ -57,9 +61,11 @@ func setupDependencies(db *gorm.DB) *TestDependencies {
 		CreateUsecase:     createUsecase,
 		GetByIDUsecase:    getByIDUsecase,
 		DeleteByIDUsecase: deleteByIDUsecase,
+		CompleteUsecase:   completeUsecase,
 		CreateHandler:     createHandler,
 		GetByIDHandler:    getByIDHandler,
 		DeleteByIDHandler: deleteByIDHandler,
+		CompleteHandler:   completeHandler,
 	}
 }
 
@@ -71,6 +77,7 @@ func setupEchoApp(deps *TestDependencies, includeGetByID bool) *echo.Echo {
 		e.GET("/todos/:id", deps.GetByIDHandler.Handle)
 	}
 	e.DELETE("/todos/:id", deps.DeleteByIDHandler.Handle)
+	e.POST("/todos/:id/complete", deps.CompleteHandler.Handle)
 	return e
 }
 
@@ -132,4 +139,19 @@ func TestTodoDeleteByIDBDD(t *testing.T) {
 	}
 
 	runBDDTest(t, app, db, []string{"features/todo_delete_by_id.feature"}, tc.InitializeScenario)
+}
+
+func TestTodoCompleteBDD(t *testing.T) {
+	db := setupDatabase(t)
+	deps := setupDependencies(db)
+	app := setupEchoApp(deps, true) // true for include GetByID and Complete
+
+	tc := &steps.TodoCompleteContext{
+		BaseTestContext: steps.BaseTestContext{
+			EchoApp: app,
+			DB:      db,
+		},
+	}
+
+	runBDDTest(t, app, db, []string{"features/todo_complete.feature"}, tc.InitializeScenario)
 }
