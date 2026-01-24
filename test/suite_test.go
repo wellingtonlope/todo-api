@@ -17,15 +17,17 @@ import (
 )
 
 type TestDependencies struct {
-	DB                *gorm.DB
-	Clock             usecase.Clock
-	Store             interface{}
-	CreateUsecase     todo.Create
-	GetByIDUsecase    todo.GetByID
-	DeleteByIDUsecase todo.DeleteByID
-	CreateHandler     *handler.TodoCreate
-	GetByIDHandler    *handler.TodoGetByID
-	DeleteByIDHandler *handler.TodoDeleteByID
+	DB                 *gorm.DB
+	Clock              usecase.Clock
+	Store              interface{}
+	CreateUsecase      todo.Create
+	GetByIDUsecase     todo.GetByID
+	DeleteByIDUsecase  todo.DeleteByID
+	MarkPendingUsecase todo.MarkAsPending
+	CreateHandler      *handler.TodoCreate
+	GetByIDHandler     *handler.TodoGetByID
+	DeleteByIDHandler  *handler.TodoDeleteByID
+	MarkPendingHandler *handler.TodoMarkPending
 }
 
 func setupDatabase(t *testing.T) *gorm.DB {
@@ -46,20 +48,24 @@ func setupDependencies(db *gorm.DB) *TestDependencies {
 	createUsecase := todo.NewCreate(store, clock)
 	getByIDUsecase := todo.NewGetByID(store)
 	deleteByIDUsecase := todo.NewDeleteByID(store)
+	markPendingUsecase := todo.NewMarkAsPending(store, clock)
 	createHandler := handler.NewTodoCreate(createUsecase)
 	getByIDHandler := handler.NewTodoGetByID(getByIDUsecase)
 	deleteByIDHandler := handler.NewTodoDeleteByID(deleteByIDUsecase)
+	markPendingHandler := handler.NewTodoMarkPending(markPendingUsecase)
 
 	return &TestDependencies{
-		DB:                db,
-		Clock:             clock,
-		Store:             store,
-		CreateUsecase:     createUsecase,
-		GetByIDUsecase:    getByIDUsecase,
-		DeleteByIDUsecase: deleteByIDUsecase,
-		CreateHandler:     createHandler,
-		GetByIDHandler:    getByIDHandler,
-		DeleteByIDHandler: deleteByIDHandler,
+		DB:                 db,
+		Clock:              clock,
+		Store:              store,
+		CreateUsecase:      createUsecase,
+		GetByIDUsecase:     getByIDUsecase,
+		DeleteByIDUsecase:  deleteByIDUsecase,
+		MarkPendingUsecase: markPendingUsecase,
+		CreateHandler:      createHandler,
+		GetByIDHandler:     getByIDHandler,
+		DeleteByIDHandler:  deleteByIDHandler,
+		MarkPendingHandler: markPendingHandler,
 	}
 }
 
@@ -71,6 +77,7 @@ func setupEchoApp(deps *TestDependencies, includeGetByID bool) *echo.Echo {
 		e.GET("/todos/:id", deps.GetByIDHandler.Handle)
 	}
 	e.DELETE("/todos/:id", deps.DeleteByIDHandler.Handle)
+	e.POST("/todos/:id/pending", deps.MarkPendingHandler.Handle)
 	return e
 }
 
@@ -132,4 +139,19 @@ func TestTodoDeleteByIDBDD(t *testing.T) {
 	}
 
 	runBDDTest(t, app, db, []string{"features/todo_delete_by_id.feature"}, tc.InitializeScenario)
+}
+
+func TestTodoMarkPendingBDD(t *testing.T) {
+	db := setupDatabase(t)
+	deps := setupDependencies(db)
+	app := setupEchoApp(deps, true) // true for include all routes
+
+	tc := &steps.TodoMarkPendingContext{
+		BaseTestContext: steps.BaseTestContext{
+			EchoApp: app,
+			DB:      db,
+		},
+	}
+
+	runBDDTest(t, app, db, []string{"features/todo_mark_pending.feature"}, tc.InitializeScenario)
 }
