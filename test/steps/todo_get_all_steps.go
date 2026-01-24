@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http/httptest"
+	"time"
 
 	"github.com/cucumber/godog"
 )
@@ -124,6 +125,14 @@ func (tc *TodoGetAllContext) validateTodoAtIndex(index int, expectedTitle, expec
 	if expectedDueDatePresent {
 		if todo.DueDate == nil {
 			return fmt.Errorf("DueDate should not be nil")
+		}
+		// Check if due date matches (allow for time format differences)
+		expectedTime, err := time.Parse(time.RFC3339, expectedDueDate)
+		if err != nil {
+			return fmt.Errorf("invalid expected due date format: %s", expectedDueDate)
+		}
+		if !todo.DueDate.Equal(expectedTime) {
+			return fmt.Errorf("expected due date %s, got %s", expectedDueDate, todo.DueDate.Format(time.RFC3339))
 		}
 	} else {
 		if todo.DueDate != nil {
