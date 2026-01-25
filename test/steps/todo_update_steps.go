@@ -1,10 +1,8 @@
 package steps
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"net/http/httptest"
 
 	"github.com/cucumber/godog"
 )
@@ -16,26 +14,11 @@ type TodoUpdateContext struct {
 }
 
 func (tc *TodoUpdateContext) IHaveCreatedATodoForUpdate(title, desc, dueDate string) error {
-	tc.SetTodoInput(title, desc, dueDate)
-	body, _ := json.Marshal(tc.TodoInput)
-	req := httptest.NewRequest("POST", "/todos", bytes.NewReader(body))
-	req.Header.Set("Content-Type", "application/json")
-	rec := httptest.NewRecorder()
-	tc.EchoApp.ServeHTTP(rec, req)
-
-	if rec.Code != 201 {
-		return fmt.Errorf("failed to create todo for test, status: %d, body: %s", rec.Code, rec.Body.String())
-	}
-
-	// Parse the created todo to get ID
-	var resp struct {
-		ID string `json:"id"`
-	}
-	err := json.Unmarshal(rec.Body.Bytes(), &resp)
+	id, err := tc.CreateTodoForTest(title, desc, dueDate)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create todo for test: %v", err)
 	}
-	tc.CreatedTodoID = resp.ID
+	tc.CreatedTodoID = id
 	return nil
 }
 
@@ -57,11 +40,11 @@ func (tc *TodoUpdateContext) IUpdateTheTodoWithIDFromTheCreatedTodo() error {
 }
 
 func (tc *TodoUpdateContext) IUpdateTheTodoWithID(id string) error {
-	body, _ := json.Marshal(tc.UpdateInput)
-	req := httptest.NewRequest("PUT", "/todos/"+id, bytes.NewReader(body))
-	req.Header.Set("Content-Type", "application/json")
-	rec := httptest.NewRecorder()
-	tc.EchoApp.ServeHTTP(rec, req)
+	client := tc.UseHTTPClient()
+	rec, err := client.UpdateTodo(id, tc.UpdateInput)
+	if err != nil {
+		return err
+	}
 	tc.Response = rec
 	return nil
 }

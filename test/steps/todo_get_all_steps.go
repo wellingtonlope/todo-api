@@ -1,10 +1,8 @@
 package steps
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"net/http/httptest"
 	"time"
 
 	"github.com/cucumber/godog"
@@ -17,9 +15,11 @@ type TodoGetAllContext struct {
 }
 
 func (tc *TodoGetAllContext) IRequestAllTodos() error {
-	req := httptest.NewRequest("GET", "/todos", nil)
-	rec := httptest.NewRecorder()
-	tc.EchoApp.ServeHTTP(rec, req)
+	client := tc.UseHTTPClient()
+	rec, err := client.GetAllTodos()
+	if err != nil {
+		return err
+	}
 	tc.Response = rec
 	return nil
 }
@@ -61,27 +61,11 @@ func (tc *TodoGetAllContext) TheResponseShouldContainAListWithTodos(count int) e
 }
 
 func (tc *TodoGetAllContext) IHaveCreatedATodoWith(title, desc, dueDate string) error {
-	tc.SetTodoInput(title, desc, dueDate)
-
-	body, _ := json.Marshal(tc.TodoInput)
-	req := httptest.NewRequest("POST", "/todos", bytes.NewReader(body))
-	req.Header.Set("Content-Type", "application/json")
-	rec := httptest.NewRecorder()
-	tc.EchoApp.ServeHTTP(rec, req)
-
-	if rec.Code != 201 {
-		return fmt.Errorf("failed to create todo for test, status: %d, body: %s", rec.Code, rec.Body.String())
-	}
-
-	// Parse the created todo to get ID
-	var resp struct {
-		ID string `json:"id"`
-	}
-	err := json.Unmarshal(rec.Body.Bytes(), &resp)
+	id, err := tc.CreateTodoForTest(title, desc, dueDate)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create todo for test: %v", err)
 	}
-	tc.CreatedTodoIDs = append(tc.CreatedTodoIDs, resp.ID)
+	tc.CreatedTodoIDs = append(tc.CreatedTodoIDs, id)
 	return nil
 }
 
@@ -146,12 +130,14 @@ func (tc *TodoGetAllContext) validateTodoAtIndex(index int, expectedTitle, expec
 func (tc *TodoGetAllContext) ResetDatabaseAndContext() error {
 	tc.CreatedTodoIDs = []string{}
 	// Reset both GORM database and in-memory store
-	if err := tc.ResetDatabase(); err != nil {
-		return err
-	}
 	if tc.ResetStoreFunc != nil {
 		tc.ResetStoreFunc()
 	}
+	if err := tc.ResetDatabase(); err != nil {
+		return err
+	}
+	// Force HTTP client recreation to use new app
+	tc.ResetHTTPClient()
 	return nil
 }
 

@@ -16,50 +16,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// FeatureType represents the type of BDD test feature
-type FeatureType int
-
-const (
-	FeatureCreation FeatureType = iota
-	FeatureGetByID
-	FeatureGetAll
-	FeatureDeleteByID
-	FeatureUpdate
-	FeatureComplete
-	FeatureMarkPending
-)
-
-// FeatureFlags defines which endpoints to include in the Echo app
-type FeatureFlags struct {
-	IncludeGetByID     bool
-	IncludeGetAll      bool
-	IncludeUpdate      bool
-	IncludeComplete    bool
-	IncludeMarkPending bool
-}
-
-// GetFeatureFlags returns the appropriate feature flags for a given feature type
-func GetFeatureFlags(featureType FeatureType) FeatureFlags {
-	switch featureType {
-	case FeatureCreation:
-		return FeatureFlags{}
-	case FeatureGetByID:
-		return FeatureFlags{IncludeGetByID: true}
-	case FeatureGetAll:
-		return FeatureFlags{IncludeGetAll: true}
-	case FeatureDeleteByID:
-		return FeatureFlags{IncludeGetByID: true}
-	case FeatureUpdate:
-		return FeatureFlags{IncludeGetByID: true, IncludeUpdate: true}
-	case FeatureComplete:
-		return FeatureFlags{IncludeGetByID: true, IncludeComplete: true}
-	case FeatureMarkPending:
-		return FeatureFlags{IncludeGetByID: true, IncludeMarkPending: true}
-	default:
-		return FeatureFlags{}
-	}
-}
-
 type TestDependencies struct {
 	DB                 *gorm.DB
 	Clock              usecase.Clock
@@ -91,21 +47,26 @@ func NewTestFactory(t *testing.T) *TestFactory {
 	return &TestFactory{t: t}
 }
 
-// SetupBDDTest returns configured dependencies for a given feature type
-func (tf *TestFactory) SetupBDDTest(featureType FeatureType) (*TestDependencies, *echo.Echo) {
+// SetupBDDTest returns configured dependencies
+func (tf *TestFactory) SetupBDDTest() (*TestDependencies, *echo.Echo) {
 	db := tf.setupDatabase()
 	deps := tf.setupDependencies(db)
-	app := tf.setupEchoApp(deps, GetFeatureFlags(featureType))
+	app := tf.setupEchoApp(deps)
 	return deps, app
 }
 
 // Reset clears the state between tests
 func (tf *TestFactory) Reset(deps *TestDependencies) {
-	deps.ResetStore()
+	_ = deps.Reset()
 }
 
-func (td *TestDependencies) ResetStore() {
-	// Create a new store to clear all data
+// Reset clears all state including database and store
+func (td *TestDependencies) Reset() error {
+	// Clear database first
+	if err := td.DB.Exec("DELETE FROM todos").Error; err != nil {
+		return err
+	}
+	// Create a fresh store to clear all data
 	store := memory.NewTodoRepository()
 	td.Store = store
 	td.CreateUsecase = todo.NewCreate(store, td.Clock)
@@ -122,16 +83,6 @@ func (td *TestDependencies) ResetStore() {
 	td.UpdateHandler = handler.NewTodoUpdate(td.UpdateUsecase)
 	td.CompleteHandler = handler.NewTodoComplete(td.CompleteUsecase)
 	td.MarkPendingHandler = handler.NewTodoMarkPending(td.MarkPendingUsecase)
-}
-
-// Reset clears all state including database and store
-func (td *TestDependencies) Reset() error {
-	// Clear database
-	if err := td.DB.Exec("DELETE FROM todos").Error; err != nil {
-		return err
-	}
-	// Reset store
-	td.ResetStore()
 	return nil
 }
 
@@ -188,27 +139,17 @@ func (tf *TestFactory) setupDependencies(db *gorm.DB) *TestDependencies {
 	}
 }
 
-// setupEchoApp configures the Echo app with the given feature flags
-func (tf *TestFactory) setupEchoApp(deps *TestDependencies, flags FeatureFlags) *echo.Echo {
+// setupEchoApp configures the Echo app with all handlers
+func (tf *TestFactory) setupEchoApp(deps *TestDependencies) *echo.Echo {
 	e := echo.New()
 	e.Use(handler.Error)
 	e.POST("/todos", deps.CreateHandler.Handle)
-	if flags.IncludeGetAll {
-		e.GET("/todos", deps.GetAllHandler.Handle)
-	}
-	if flags.IncludeGetByID {
-		e.GET("/todos/:id", deps.GetByIDHandler.Handle)
-	}
+	e.GET("/todos", deps.GetAllHandler.Handle)
+	e.GET("/todos/:id", deps.GetByIDHandler.Handle)
 	e.DELETE("/todos/:id", deps.DeleteByIDHandler.Handle)
-	if flags.IncludeUpdate {
-		e.PUT("/todos/:id", deps.UpdateHandler.Handle)
-	}
-	if flags.IncludeComplete {
-		e.POST("/todos/:id/complete", deps.CompleteHandler.Handle)
-	}
-	if flags.IncludeMarkPending {
-		e.POST("/todos/:id/pending", deps.MarkPendingHandler.Handle)
-	}
+	e.PUT("/todos/:id", deps.UpdateHandler.Handle)
+	e.POST("/todos/:id/complete", deps.CompleteHandler.Handle)
+	e.POST("/todos/:id/pending", deps.MarkPendingHandler.Handle)
 	return e
 }
 
@@ -229,7 +170,7 @@ func runBDDTest(t *testing.T, app *echo.Echo, db *gorm.DB, featurePaths []string
 
 func TestTodoCreationBDD(t *testing.T) {
 	factory := NewTestFactory(t)
-	deps, app := factory.SetupBDDTest(FeatureCreation)
+	deps, app := factory.SetupBDDTest()
 
 	tc := &steps.TodoCreationContext{
 		BaseTestContext: steps.BaseTestContext{
@@ -243,7 +184,7 @@ func TestTodoCreationBDD(t *testing.T) {
 
 func TestTodoGetByIDBDD(t *testing.T) {
 	factory := NewTestFactory(t)
-	deps, app := factory.SetupBDDTest(FeatureGetByID)
+	deps, app := factory.SetupBDDTest()
 
 	tc := &steps.TodoGetByIDContext{
 		BaseTestContext: steps.BaseTestContext{
@@ -257,7 +198,7 @@ func TestTodoGetByIDBDD(t *testing.T) {
 
 func TestTodoDeleteByIDBDD(t *testing.T) {
 	factory := NewTestFactory(t)
-	deps, app := factory.SetupBDDTest(FeatureDeleteByID)
+	deps, app := factory.SetupBDDTest()
 
 	tc := &steps.TodoDeleteByIDContext{
 		BaseTestContext: steps.BaseTestContext{
@@ -271,7 +212,7 @@ func TestTodoDeleteByIDBDD(t *testing.T) {
 
 func TestTodoGetAllBDD(t *testing.T) {
 	factory := NewTestFactory(t)
-	deps, app := factory.SetupBDDTest(FeatureGetAll)
+	deps, app := factory.SetupBDDTest()
 
 	tc := &steps.TodoGetAllContext{
 		BaseTestContext: steps.BaseTestContext{
@@ -283,7 +224,7 @@ func TestTodoGetAllBDD(t *testing.T) {
 	// Set up the ResetStoreFunc with proper closure
 	tc.ResetStoreFunc = func() {
 		factory.Reset(deps)
-		newApp := factory.setupEchoApp(deps, GetFeatureFlags(FeatureGetAll))
+		newApp := factory.setupEchoApp(deps)
 		tc.EchoApp = newApp
 	}
 
@@ -292,7 +233,7 @@ func TestTodoGetAllBDD(t *testing.T) {
 
 func TestTodoUpdateBDD(t *testing.T) {
 	factory := NewTestFactory(t)
-	deps, app := factory.SetupBDDTest(FeatureUpdate)
+	deps, app := factory.SetupBDDTest()
 
 	tc := &steps.TodoUpdateContext{
 		BaseTestContext: steps.BaseTestContext{
@@ -306,7 +247,7 @@ func TestTodoUpdateBDD(t *testing.T) {
 
 func TestTodoCompleteBDD(t *testing.T) {
 	factory := NewTestFactory(t)
-	deps, app := factory.SetupBDDTest(FeatureComplete)
+	deps, app := factory.SetupBDDTest()
 
 	tc := &steps.TodoCompleteContext{
 		BaseTestContext: steps.BaseTestContext{
@@ -320,7 +261,7 @@ func TestTodoCompleteBDD(t *testing.T) {
 
 func TestTodoMarkPendingBDD(t *testing.T) {
 	factory := NewTestFactory(t)
-	deps, app := factory.SetupBDDTest(FeatureMarkPending)
+	deps, app := factory.SetupBDDTest()
 
 	tc := &steps.TodoMarkPendingContext{
 		BaseTestContext: steps.BaseTestContext{

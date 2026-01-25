@@ -1,10 +1,6 @@
 package steps
 
 import (
-	"bytes"
-	"encoding/json"
-	"net/http/httptest"
-
 	"github.com/cucumber/godog"
 )
 
@@ -18,11 +14,11 @@ func (tc *TodoCreationContext) IHaveATodoInput(title, desc, dueDate string) erro
 }
 
 func (tc *TodoCreationContext) ICreateTheTodo() error {
-	body, _ := json.Marshal(tc.TodoInput)
-	req := httptest.NewRequest("POST", "/todos", bytes.NewReader(body))
-	req.Header.Set("Content-Type", "application/json")
-	rec := httptest.NewRecorder()
-	tc.EchoApp.ServeHTTP(rec, req)
+	client := tc.UseHTTPClient()
+	rec, err := client.CreateTodo(tc.TodoInput)
+	if err != nil {
+		return err
+	}
 	tc.Response = rec
 	return nil
 }

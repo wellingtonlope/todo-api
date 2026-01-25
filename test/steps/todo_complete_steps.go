@@ -3,8 +3,6 @@ package steps
 import (
 	"encoding/json"
 	"fmt"
-	"net/http/httptest"
-	"strings"
 
 	"github.com/cucumber/godog"
 )
@@ -20,11 +18,11 @@ func (tc *TodoCompleteContext) IHaveATodoWithTitleAndDescription(title, desc str
 }
 
 func (tc *TodoCompleteContext) ICreateTheTodo() error {
-	body, _ := json.Marshal(tc.TodoInput)
-	req := httptest.NewRequest("POST", "/todos", strings.NewReader(string(body)))
-	req.Header.Set("Content-Type", "application/json")
-	rec := httptest.NewRecorder()
-	tc.EchoApp.ServeHTTP(rec, req)
+	client := tc.UseHTTPClient()
+	rec, err := client.CreateTodo(tc.TodoInput)
+	if err != nil {
+		return err
+	}
 	tc.Response = rec
 
 	// Extract the created todo ID
@@ -46,9 +44,11 @@ func (tc *TodoCompleteContext) TheTodoShouldBeCreatedSuccessfully() error {
 }
 
 func (tc *TodoCompleteContext) IMarkTheTodoAsComplete() error {
-	req := httptest.NewRequest("POST", "/todos/"+tc.createdTodoID+"/complete", nil)
-	rec := httptest.NewRecorder()
-	tc.EchoApp.ServeHTTP(rec, req)
+	client := tc.UseHTTPClient()
+	rec, err := client.CompleteTodo(tc.createdTodoID)
+	if err != nil {
+		return err
+	}
 	tc.Response = rec
 	return nil
 }
@@ -58,9 +58,11 @@ func (tc *TodoCompleteContext) IMarkTheTodoAsCompleteAgain() error {
 }
 
 func (tc *TodoCompleteContext) IMarkTodoWithIDAsComplete(id string) error {
-	req := httptest.NewRequest("POST", "/todos/"+id+"/complete", nil)
-	rec := httptest.NewRecorder()
-	tc.EchoApp.ServeHTTP(rec, req)
+	client := tc.UseHTTPClient()
+	rec, err := client.CompleteTodo(id)
+	if err != nil {
+		return err
+	}
 	tc.Response = rec
 	return nil
 }

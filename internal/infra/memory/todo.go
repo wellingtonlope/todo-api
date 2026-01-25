@@ -28,6 +28,14 @@ func (r *todo) GetAll(_ context.Context) ([]domain.Todo, error) {
 	for _, item := range r.todos {
 		todos = append(todos, item)
 	}
+	// Sort by created_at to ensure consistent order
+	for i := 0; i < len(todos); i++ {
+		for j := i + 1; j < len(todos); j++ {
+			if todos[i].CreatedAt.After(todos[j].CreatedAt) {
+				todos[i], todos[j] = todos[j], todos[i]
+			}
+		}
+	}
 	return todos, nil
 }
 
