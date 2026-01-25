@@ -6,33 +6,19 @@ import (
 
 // TestFXOptions returns FX configuration for BDD tests using in-memory SQLite
 func TestFXOptions() fx.Option {
-	config := Config{
-		DatabasePath:  ":memory:",
-		WithLifecycle: false,
-		WithSwagger:   false,
-		Port:          "",
-	}
-
-	providers := []interface{}{
-		// Configuration
-		func() Config { return config },
-
-		// Common providers
-		provideMiddlewares,
-		provideEcho,
-		provideDatabase,
-		provideClock,
-		provideRepository,
-		provideUseCases,
-		provideHandlers,
-	}
-
-	invokes := []interface{}{
-		provideHandlerRegistration(),
-	}
-
 	return fx.Options(
-		fx.Provide(providers...),
-		fx.Invoke(invokes...),
+		// Test configuration
+		fx.Supply(Config{
+			DatabasePath:  ":memory:",
+			WithLifecycle: false,
+			WithSwagger:   false,
+			Port:          "",
+		}),
+		// Infrastructure providers (middlewares, database, handler registration)
+		InfrastructureProviders(),
+		// Common providers (clock, repositories, use cases, handlers)
+		CommonProviders(),
+		// Test-specific providers
+		fx.Provide(provideEcho),
 	)
 }

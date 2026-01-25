@@ -1,3 +1,5 @@
+.PHONY: all test server build format lint
+
 all: format lint test
 
 test:
