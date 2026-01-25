@@ -17,6 +17,19 @@ const (
 	ContentTypeJSON  = "application/json"
 )
 
+// Input structs for validation - matching handler input structs
+type TodoCreateInput struct {
+	Title       string     `json:"title"`
+	Description string     `json:"description"`
+	DueDate     *time.Time `json:"due_date,omitempty"`
+}
+
+type TodoUpdateInput struct {
+	Title       string     `json:"title"`
+	Description string     `json:"description"`
+	DueDate     *time.Time `json:"due_date,omitempty"`
+}
+
 type TodoResponse struct {
 	ID          string     `json:"id"`
 	Title       string     `json:"title"`
@@ -63,51 +76,28 @@ func ShouldHaveValidResponseHeaders(response *httptest.ResponseRecorder, expecte
 
 // Todo Asserts
 
-func ShouldHaveCreatedTodo(response *httptest.ResponseRecorder, expectedInput map[string]interface{}) error {
+func ShouldHaveCreatedTodo(response *httptest.ResponseRecorder, input *TodoCreateInput) error {
 	if err := ShouldHaveValidResponseHeaders(response, StatusCreated); err != nil {
 		return err
 	}
 
-	var resp TodoResponse
-	if err := json.Unmarshal(response.Body.Bytes(), &resp); err != nil {
-		return fmt.Errorf("failed to parse todo response: %w", err)
-	}
-
-	return validateTodoFields(&resp, expectedInput)
+	return validateCreateTodoResponse(response, input)
 }
 
-func ShouldHaveRetrievedTodo(response *httptest.ResponseRecorder, expectedID, expectedTitle, expectedDesc, expectedDueDate string) error {
+func ShouldHaveRetrievedTodo(response *httptest.ResponseRecorder, expectedID string, input *TodoUpdateInput) error {
 	if err := ShouldHaveValidResponseHeaders(response, StatusOK); err != nil {
 		return err
 	}
 
-	var resp TodoResponse
-	if err := json.Unmarshal(response.Body.Bytes(), &resp); err != nil {
-		return fmt.Errorf("failed to parse todo response: %w", err)
-	}
-
-	if resp.ID != expectedID {
-		return fmt.Errorf("expected ID %s, got %s", expectedID, resp.ID)
-	}
-
-	return validateTodoFieldsWithStrings(&resp, expectedTitle, expectedDesc, expectedDueDate)
+	return validateTodoResponse(response, expectedID, input)
 }
 
-func ShouldHaveUpdatedTodo(response *httptest.ResponseRecorder, expectedID, expectedTitle, expectedDesc, expectedDueDate string) error {
+func ShouldHaveUpdatedTodo(response *httptest.ResponseRecorder, expectedID string, input *TodoUpdateInput) error {
 	if err := ShouldHaveValidResponseHeaders(response, StatusOK); err != nil {
 		return err
 	}
 
-	var resp TodoResponse
-	if err := json.Unmarshal(response.Body.Bytes(), &resp); err != nil {
-		return fmt.Errorf("failed to parse todo response: %w", err)
-	}
-
-	if resp.ID != expectedID {
-		return fmt.Errorf("expected ID %s, got %s", expectedID, resp.ID)
-	}
-
-	return validateTodoFieldsWithStrings(&resp, expectedTitle, expectedDesc, expectedDueDate)
+	return validateTodoResponse(response, expectedID, input)
 }
 
 func ShouldHaveDeletedTodo(response *httptest.ResponseRecorder) error {
@@ -160,24 +150,22 @@ func ShouldReturnError(response *httptest.ResponseRecorder, expectedStatus int, 
 
 // Field Validators
 
-func validateTodoFields(resp *TodoResponse, expectedInput map[string]interface{}) error {
+func validateCreateTodoResponse(response *httptest.ResponseRecorder, input *TodoCreateInput) error {
+	var resp TodoResponse
+	if err := json.Unmarshal(response.Body.Bytes(), &resp); err != nil {
+		return fmt.Errorf("failed to parse todo response: %w", err)
+	}
+
 	if resp.ID == "" {
 		return fmt.Errorf("todo ID should not be empty")
 	}
 
-	if resp.Title != expectedInput["title"] {
-		return fmt.Errorf("expected title '%s', got '%s'", expectedInput["title"], resp.Title)
+	if resp.Title != input.Title {
+		return fmt.Errorf("expected title '%s', got '%s'", input.Title, resp.Title)
 	}
 
-	expectedDesc, hasDesc := expectedInput["description"]
-	if hasDesc {
-		if resp.Description != expectedDesc {
-			return fmt.Errorf("expected description '%s', got '%s'", expectedDesc, resp.Description)
-		}
-	} else {
-		if resp.Description != "" {
-			return fmt.Errorf("expected description to be empty, got '%s'", resp.Description)
-		}
+	if resp.Description != input.Description {
+		return fmt.Errorf("expected description '%s', got '%s'", input.Description, resp.Description)
 	}
 
 	if resp.Status != "pending" {
@@ -192,10 +180,12 @@ func validateTodoFields(resp *TodoResponse, expectedInput map[string]interface{}
 		return fmt.Errorf("UpdatedAt should not be zero")
 	}
 
-	_, hasDueDate := expectedInput["due_date"]
-	if hasDueDate {
+	if input.DueDate != nil {
 		if resp.DueDate == nil {
 			return fmt.Errorf("DueDate should not be nil when provided in input")
+		}
+		if !input.DueDate.Equal(*resp.DueDate) {
+			return fmt.Errorf("expected due_date %v, got %v", input.DueDate, resp.DueDate)
 		}
 	} else {
 		if resp.DueDate != nil {
@@ -206,20 +196,22 @@ func validateTodoFields(resp *TodoResponse, expectedInput map[string]interface{}
 	return nil
 }
 
-func validateTodoFieldsWithStrings(resp *TodoResponse, expectedTitle, expectedDesc, expectedDueDate string) error {
-	if resp.Title != expectedTitle {
-		return fmt.Errorf("expected title '%s', got '%s'", expectedTitle, resp.Title)
+func validateTodoResponse(response *httptest.ResponseRecorder, expectedID string, input *TodoUpdateInput) error {
+	var resp TodoResponse
+	if err := json.Unmarshal(response.Body.Bytes(), &resp); err != nil {
+		return fmt.Errorf("failed to parse todo response: %w", err)
 	}
 
-	expectedDescPresent := expectedDesc != ""
-	if expectedDescPresent {
-		if resp.Description != expectedDesc {
-			return fmt.Errorf("expected description '%s', got '%s'", expectedDesc, resp.Description)
-		}
-	} else {
-		if resp.Description != "" {
-			return fmt.Errorf("expected description to be empty, got '%s'", resp.Description)
-		}
+	if resp.ID != expectedID {
+		return fmt.Errorf("expected ID %s, got %s", expectedID, resp.ID)
+	}
+
+	if resp.Title != input.Title {
+		return fmt.Errorf("expected title '%s', got '%s'", input.Title, resp.Title)
+	}
+
+	if resp.Description != input.Description {
+		return fmt.Errorf("expected description '%s', got '%s'", input.Description, resp.Description)
 	}
 
 	if resp.Status != "pending" {
@@ -234,21 +226,16 @@ func validateTodoFieldsWithStrings(resp *TodoResponse, expectedTitle, expectedDe
 		return fmt.Errorf("UpdatedAt should not be zero")
 	}
 
-	expectedDueDatePresent := expectedDueDate != ""
-	if expectedDueDatePresent {
+	if input.DueDate != nil {
 		if resp.DueDate == nil {
-			return fmt.Errorf("DueDate should not be nil")
+			return fmt.Errorf("DueDate should not be nil when provided in input")
 		}
-		parsedDueDate, err := time.Parse(time.RFC3339, expectedDueDate)
-		if err != nil {
-			return fmt.Errorf("invalid due_date format in test: %s", expectedDueDate)
-		}
-		if !resp.DueDate.Equal(parsedDueDate) {
-			return fmt.Errorf("expected due_date %v, got %v", parsedDueDate, resp.DueDate)
+		if !input.DueDate.Equal(*resp.DueDate) {
+			return fmt.Errorf("expected due_date %v, got %v", input.DueDate, resp.DueDate)
 		}
 	} else {
 		if resp.DueDate != nil {
-			return fmt.Errorf("DueDate should be nil")
+			return fmt.Errorf("DueDate should be nil when not provided in input")
 		}
 	}
 
