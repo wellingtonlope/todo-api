@@ -5,7 +5,7 @@ This document contains information about the key dependencies and technology sta
 ## Technology Stack
 
 ### Core Framework
-- **Go 1.24** - Programming language and runtime
+- **Go 1.25.6** - Programming language and runtime
 - **Echo v4** - HTTP web framework for building REST APIs
 
 ### Database & Persistence

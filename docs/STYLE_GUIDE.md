@@ -4,10 +4,7 @@ This document contains code style guidelines, naming conventions, and formatting
 
 ## General Principles
 
-- Follow Clean Architecture: domain → application (usecase) → infrastructure
-- Keep functions small and focused on a single responsibility
-- Use interfaces to define contracts between layers
-- Prefer composition over inheritance
+See [ARCHITECTURE.md](ARCHITECTURE.md) for architectural principles and [AGENTS.md](../AGENTS.md) for overall project guidelines.
 
 ## Naming Conventions
 

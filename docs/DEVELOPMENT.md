@@ -32,6 +32,8 @@ golangci-lint run
 swag init -g cmd/api/main.go -o docs/
 ```
 
+Prefer using the `make` targets for consistency; the direct commands are equivalent and provided for reference.
+
 ## Testing Patterns
 
 - Use table-driven tests with `t.Run()` for multiple scenarios
