@@ -19,7 +19,7 @@ func TestUpdate_Handle(t *testing.T) {
 	testCases := []struct {
 		name        string
 		updateStore *updateStoreMock
-		clock       *usecase.ClockMock
+		clock       *clockMock
 		ctx         context.Context
 		input       todo.UpdateInput
 		result      todo.TodoOutput
@@ -33,7 +33,7 @@ func TestUpdate_Handle(t *testing.T) {
 					Return(domain.Todo{}, todo.ErrGetByIDStoreNotFound).Once()
 				return m
 			}(),
-			clock: usecase.NewClockMock(),
+			clock: newClockMock(),
 			ctx:   context.TODO(),
 			input: todo.UpdateInput{
 				ID:          "123",
@@ -52,7 +52,7 @@ func TestUpdate_Handle(t *testing.T) {
 					Return(domain.Todo{}, assert.AnError).Once()
 				return m
 			}(),
-			clock: usecase.NewClockMock(),
+			clock: newClockMock(),
 			ctx:   context.TODO(),
 			input: todo.UpdateInput{
 				ID:          "123",
@@ -78,8 +78,8 @@ func TestUpdate_Handle(t *testing.T) {
 					}, nil).Once()
 				return m
 			}(),
-			clock: func() *usecase.ClockMock {
-				m := usecase.NewClockMock()
+			clock: func() *clockMock {
+				m := newClockMock()
 				m.On("Now").Return(exampleDateUpdated).Once()
 				return m
 			}(),
@@ -116,8 +116,8 @@ func TestUpdate_Handle(t *testing.T) {
 				}).Return(domain.Todo{}, todo.ErrUpdateStoreNotFound).Once()
 				return m
 			}(),
-			clock: func() *usecase.ClockMock {
-				m := usecase.NewClockMock()
+			clock: func() *clockMock {
+				m := newClockMock()
 				m.On("Now").Return(exampleDateUpdated).Once()
 				return m
 			}(),
@@ -154,8 +154,8 @@ func TestUpdate_Handle(t *testing.T) {
 				}).Return(domain.Todo{}, assert.AnError).Once()
 				return m
 			}(),
-			clock: func() *usecase.ClockMock {
-				m := usecase.NewClockMock()
+			clock: func() *clockMock {
+				m := newClockMock()
 				m.On("Now").Return(exampleDateUpdated).Once()
 				return m
 			}(),
@@ -199,8 +199,8 @@ func TestUpdate_Handle(t *testing.T) {
 				}, nil).Once()
 				return m
 			}(),
-			clock: func() *usecase.ClockMock {
-				m := usecase.NewClockMock()
+			clock: func() *clockMock {
+				m := newClockMock()
 				m.On("Now").Return(exampleDateUpdated).Once()
 				return m
 			}(),

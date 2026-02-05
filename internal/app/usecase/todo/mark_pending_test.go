@@ -18,7 +18,7 @@ func TestMarkAsPending_Handle(t *testing.T) {
 	testCases := []struct {
 		name               string
 		markAsPendingStore *markAsPendingStoreMock
-		clock              *usecase.ClockMock
+		clock              *clockMock
 		ctx                context.Context
 		input              todo.MarkAsPendingInput
 		result             todo.TodoOutput
@@ -32,8 +32,8 @@ func TestMarkAsPending_Handle(t *testing.T) {
 					Return(domain.Todo{}, todo.ErrGetByIDStoreNotFound).Once()
 				return m
 			}(),
-			clock: func() *usecase.ClockMock {
-				m := usecase.NewClockMock()
+			clock: func() *clockMock {
+				m := newClockMock()
 				return m
 			}(),
 			ctx: context.TODO(),
@@ -52,8 +52,8 @@ func TestMarkAsPending_Handle(t *testing.T) {
 					Return(domain.Todo{}, assert.AnError).Once()
 				return m
 			}(),
-			clock: func() *usecase.ClockMock {
-				m := usecase.NewClockMock()
+			clock: func() *clockMock {
+				m := newClockMock()
 				return m
 			}(),
 			ctx: context.TODO(),
@@ -87,8 +87,8 @@ func TestMarkAsPending_Handle(t *testing.T) {
 				}).Return(domain.Todo{}, assert.AnError).Once()
 				return m
 			}(),
-			clock: func() *usecase.ClockMock {
-				m := usecase.NewClockMock()
+			clock: func() *clockMock {
+				m := newClockMock()
 				m.On("Now").Return(exampleDateUpdated).Once()
 				return m
 			}(),
@@ -130,8 +130,8 @@ func TestMarkAsPending_Handle(t *testing.T) {
 				}, nil).Once()
 				return m
 			}(),
-			clock: func() *usecase.ClockMock {
-				m := usecase.NewClockMock()
+			clock: func() *clockMock {
+				m := newClockMock()
 				m.On("Now").Return(exampleDateUpdated).Once()
 				return m
 			}(),

@@ -18,7 +18,7 @@ func TestCreate_Handle(t *testing.T) {
 	testCases := []struct {
 		name        string
 		createStore *createStoreMock
-		clock       *usecase.ClockMock
+		clock       *clockMock
 		ctx         context.Context
 		input       todo.CreateInput
 		result      todo.TodoOutput
@@ -27,8 +27,8 @@ func TestCreate_Handle(t *testing.T) {
 		{
 			name:        "should fail when input is invalid",
 			createStore: new(createStoreMock),
-			clock: func() *usecase.ClockMock {
-				m := usecase.NewClockMock()
+			clock: func() *clockMock {
+				m := newClockMock()
 				m.On("Now").Return(exampleDate).Once()
 				return m
 			}(),
@@ -54,8 +54,8 @@ func TestCreate_Handle(t *testing.T) {
 				}).Return(domain.Todo{}, assert.AnError).Once()
 				return m
 			}(),
-			clock: func() *usecase.ClockMock {
-				m := usecase.NewClockMock()
+			clock: func() *clockMock {
+				m := newClockMock()
 				m.On("Now").Return(exampleDate).Once()
 				return m
 			}(),
@@ -88,8 +88,8 @@ func TestCreate_Handle(t *testing.T) {
 				}, nil).Once()
 				return m
 			}(),
-			clock: func() *usecase.ClockMock {
-				m := usecase.NewClockMock()
+			clock: func() *clockMock {
+				m := newClockMock()
 				m.On("Now").Return(exampleDate).Once()
 				return m
 			}(),
