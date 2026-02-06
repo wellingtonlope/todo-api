@@ -1,4 +1,4 @@
-.PHONY: all test server build format lint swagger
+.PHONY: all test server build format lint swagger deps-update
 
 all: format lint test
 
@@ -31,4 +31,8 @@ swagger:
 		go install github.com/swaggo/swag/cmd/swag@latest; \
 	fi
 	swag init -g cmd/api/main.go -o docs/
+
+deps-update:
+	go get -u ./...
+	go mod tidy
 
