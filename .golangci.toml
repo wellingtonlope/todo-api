@@ -4,7 +4,7 @@ run.timeout = "5m"
 
 [linters]
   default = "none"
-  enable = ["errcheck", "gosimple", "govet", "ineffassign", "staticcheck", "unused"]
+  enable = ["errcheck", "govet", "ineffassign", "staticcheck", "unused"]
 
 [[linters.exclusions.rules]]
   path = "_test\\.go"
