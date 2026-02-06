@@ -1,0 +1,9 @@
+run.timeout = "5m"
+
+[linters]
+  disable-all = false
+  enable = ["errcheck", "gosimple", "govet", "ineffassign", "staticcheck", "unused"]
+
+[[issues.exclude-rules]]
+  path = "_test\\.go"
+  linters = ["dupl"]
