@@ -9,22 +9,20 @@ Ensure code quality with formatting and linting.
 ## When to use me
 Before committing changes.
 
-## Commands
+## Commands (use Makefile)
 ```bash
 # Format code
-gofumpt -w .
-
-# Or via Makefile
 make format
 
 # Lint code
-golangci-lint run
-
-# Or via Makefile
 make lint
 
-# Run both
-make format && make lint
+# Run both + tests
+make all
+
+# Direct commands (avoid if possible)
+gofumpt -w .
+golangci-lint run
 ```
 
 ## Rules

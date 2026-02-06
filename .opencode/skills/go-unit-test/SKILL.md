@@ -40,6 +40,15 @@ func TestXxx_Handle(t *testing.T) {
 }
 ```
 
+## Commands (use Makefile)
+```bash
+# Run all tests
+make test
+
+# Run specific test
+go test ./internal/app/usecase/todo -run TestCreate_Handle -v
+```
+
 ## Rules
 1. Use table-driven tests with t.Run()
 2. Create mocks embedding mock.Mock

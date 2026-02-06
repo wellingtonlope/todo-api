@@ -29,4 +29,4 @@ Creating or modifying API endpoints.
 1. Add above the Handle method
 2. Use correct HTTP method in @Router
 3. Define response types (use existing todoOutput or create new)
-4. Run `swag init -g cmd/api/main.go -o docs/` after changes
+4. Regenerate docs: `make swagger` (preferred) or `swag init -g cmd/api/main.go -o docs/`

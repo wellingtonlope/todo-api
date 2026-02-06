@@ -25,6 +25,15 @@ func (c *XxxContext) InitializeScenario(ctx *godog.ScenarioContext) {
 }
 ```
 
+## Commands (use Makefile)
+```bash
+# Run BDD tests
+make test
+
+# Run specific test
+go test ./test -v
+```
+
 ## Rules
 1. Use validation_helpers.go for common validations
 2. Use HTTP client from http_client.go
