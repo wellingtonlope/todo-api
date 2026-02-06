@@ -26,9 +26,13 @@ func (r *todoRepository) Create(ctx context.Context, t domain.Todo) (domain.Todo
 	return toDomain(model), nil
 }
 
-func (r *todoRepository) GetAll(ctx context.Context) ([]domain.Todo, error) {
+func (r *todoRepository) List(ctx context.Context, status *domain.TodoStatus) ([]domain.Todo, error) {
 	var models []TodoModel
-	if err := r.db.WithContext(ctx).Find(&models).Error; err != nil {
+	query := r.db.WithContext(ctx)
+	if status != nil {
+		query = query.Where("status = ?", string(*status))
+	}
+	if err := query.Find(&models).Error; err != nil {
 		return nil, err
 	}
 	todos := make([]domain.Todo, len(models))

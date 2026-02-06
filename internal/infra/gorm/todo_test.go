@@ -41,31 +41,51 @@ func TestCreate(t *testing.T) {
 	assert.Equal(t, created, retrieved)
 }
 
-func TestGetAll(t *testing.T) {
+func TestList(t *testing.T) {
 	db := setupTestDB(t)
 	repo := NewTodoRepository(db)
-	todos, err := repo.GetAll(context.Background())
+
+	// Test empty list
+	todos, err := repo.List(context.Background(), nil)
 	assert.Nil(t, err)
 	assert.Len(t, todos, 0)
 
+	// Create test todos
 	date := time.Now().UTC()
 	todo1, _ := domain.NewTodo("Todo 1", "", date, nil)
 	todo2, _ := domain.NewTodo("Todo 2", "", date, nil)
-	_, err = repo.Create(context.Background(), todo1)
-	assert.Nil(t, err)
-	_, err = repo.Create(context.Background(), todo2)
-	assert.Nil(t, err)
+	created1, _ := repo.Create(context.Background(), todo1)
+	created2, _ := repo.Create(context.Background(), todo2)
 
-	todos, err = repo.GetAll(context.Background())
+	// Test list all
+	todos, err = repo.List(context.Background(), nil)
 	assert.Nil(t, err)
 	assert.Len(t, todos, 2)
-	// Check if both are present (order may vary)
 	titles := make([]string, len(todos))
 	for i, td := range todos {
 		titles[i] = td.Title
 	}
 	assert.Contains(t, titles, "Todo 1")
 	assert.Contains(t, titles, "Todo 2")
+
+	// Complete one todo
+	completedTodo := created1.MarkAsCompleted(time.Now().UTC())
+	_, err = repo.Update(context.Background(), completedTodo)
+	assert.Nil(t, err)
+
+	// Test filter by pending status
+	pendingStatus := domain.TodoStatusPending
+	pendingTodos, err := repo.List(context.Background(), &pendingStatus)
+	assert.Nil(t, err)
+	assert.Len(t, pendingTodos, 1)
+	assert.Equal(t, created2.ID, pendingTodos[0].ID)
+
+	// Test filter by completed status
+	completedStatus := domain.TodoStatusCompleted
+	completedTodos, err := repo.List(context.Background(), &completedStatus)
+	assert.Nil(t, err)
+	assert.Len(t, completedTodos, 1)
+	assert.Equal(t, created1.ID, completedTodos[0].ID)
 }
 
 func TestGetByID(t *testing.T) {

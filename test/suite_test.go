@@ -127,11 +127,11 @@ func TestTodoDeleteByIDBDD(t *testing.T) {
 	runBDDTest(t, app, deps.DB, []string{"features/todo_delete_by_id.feature"}, tc.InitializeScenario)
 }
 
-func TestTodoGetAllBDD(t *testing.T) {
+func TestTodoListBDD(t *testing.T) {
 	factory := NewTestFactory(t)
 	deps, app := factory.SetupBDDTest()
 
-	tc := &steps.TodoGetAllContext{
+	tc := &steps.TodoListContext{
 		BaseTestContext: steps.BaseTestContext{
 			EchoApp: app,
 			DB:      deps.DB,
@@ -145,7 +145,7 @@ func TestTodoGetAllBDD(t *testing.T) {
 		tc.EchoApp = factory.echoApp
 	}
 
-	runBDDTest(t, app, deps.DB, []string{"features/todo_get_all.feature"}, tc.InitializeScenario)
+	runBDDTest(t, app, deps.DB, []string{"features/todo_list.feature"}, tc.InitializeScenario)
 }
 
 func TestTodoUpdateBDD(t *testing.T) {

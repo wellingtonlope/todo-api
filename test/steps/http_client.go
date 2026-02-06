@@ -62,8 +62,15 @@ func (c *HTTPClient) MarkPendingTodo(id string) (*httptest.ResponseRecorder, err
 	return rec, nil
 }
 
-func (c *HTTPClient) GetAllTodos() (*httptest.ResponseRecorder, error) {
+func (c *HTTPClient) ListTodos() (*httptest.ResponseRecorder, error) {
 	req := httptest.NewRequest("GET", "/todos", nil)
+	rec := httptest.NewRecorder()
+	c.app.ServeHTTP(rec, req)
+	return rec, nil
+}
+
+func (c *HTTPClient) ListTodosWithStatus(status string) (*httptest.ResponseRecorder, error) {
+	req := httptest.NewRequest("GET", "/todos?status="+status, nil)
 	rec := httptest.NewRecorder()
 	c.app.ServeHTTP(rec, req)
 	return rec, nil

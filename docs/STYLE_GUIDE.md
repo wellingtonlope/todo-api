@@ -16,7 +16,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for architectural principles and [AGENTS.
 - Use PascalCase for exported identifiers
 
 ### Interfaces
-- Name interfaces after the action they enable (e.g., `Create`, `GetAll`, `Clock`)
+- Name interfaces after the action they enable (e.g., `Create`, `List`, `Clock`)
 
 ### Types
 - Public types use PascalCase

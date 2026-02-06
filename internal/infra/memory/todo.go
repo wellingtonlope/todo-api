@@ -23,9 +23,12 @@ func (r *todo) Create(_ context.Context, todo domain.Todo) (domain.Todo, error) 
 	return todo, nil
 }
 
-func (r *todo) GetAll(_ context.Context) ([]domain.Todo, error) {
+func (r *todo) List(_ context.Context, status *domain.TodoStatus) ([]domain.Todo, error) {
 	todos := make([]domain.Todo, 0, len(r.todos))
 	for _, item := range r.todos {
+		if status != nil && item.Status != *status {
+			continue
+		}
 		todos = append(todos, item)
 	}
 	// Sort by created_at to ensure consistent order

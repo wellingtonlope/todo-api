@@ -21,7 +21,7 @@ func CommonProviders() fx.Option {
 		fx.Annotate(
 			gormRepo.NewTodoRepository,
 			fx.As(new(todo.CreateStore)),
-			fx.As(new(todo.GetAllStore)),
+			fx.As(new(todo.ListStore)),
 			fx.As(new(todo.GetByIDStore)),
 			fx.As(new(todo.DeleteByIDStore)),
 			fx.As(new(todo.UpdateStore)),
@@ -34,8 +34,8 @@ func CommonProviders() fx.Option {
 			fx.As(new(todo.Create)),
 		),
 		fx.Annotate(
-			todo.NewGetAll,
-			fx.As(new(todo.GetAll)),
+			todo.NewList,
+			fx.As(new(todo.List)),
 		),
 		fx.Annotate(
 			todo.NewGetByID,
@@ -64,7 +64,7 @@ func CommonProviders() fx.Option {
 			fx.ResultTags(`group:"handlers"`),
 		),
 		fx.Annotate(
-			handler.NewTodoGetAll,
+			handler.NewTodoList,
 			fx.As(new(handler.Handler)),
 			fx.ResultTags(`group:"handlers"`),
 		),
