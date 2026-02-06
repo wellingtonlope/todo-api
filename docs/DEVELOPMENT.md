@@ -29,7 +29,7 @@ make lint
 golangci-lint run
 
 # Generate Swagger docs
-swag init -g cmd/api/main.go -o docs/
+make swagger
 ```
 
 Prefer using the `make` targets for consistency; the direct commands are equivalent and provided for reference.

@@ -59,7 +59,7 @@ type ErrorResponse struct {
 ### Generate Swagger Docs
 
 ```bash
-swag init -g cmd/api/main.go -o docs/
+make swagger
 ```
 
 ### Access Documentation
@@ -73,7 +73,7 @@ When the server is running, access the Swagger UI at:
 Always regenerate documentation after making changes to handlers or API endpoints:
 
 1. Update handler annotations
-2. Run `swag init -g cmd/api/main.go -o docs/`
+2. Run `make swagger`
 3. Restart the server to see changes
 
 ## Best Practices

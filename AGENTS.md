@@ -20,7 +20,7 @@ make build && make server
 make format && make lint
 
 # Generate Swagger docs
-swag init -g cmd/api/main.go -o docs/
+make swagger
 ```
 
 ### Prerequisites
@@ -75,7 +75,7 @@ make test
 make server
 
 # Swagger (optional)
-swag init -g cmd/api/main.go -o docs/
+make swagger
 ```
 
 1. Read the relevant documentation files based on your task

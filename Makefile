@@ -1,4 +1,4 @@
-.PHONY: all test server build format lint
+.PHONY: all test server build format lint swagger
 
 all: format lint test
 
@@ -24,4 +24,11 @@ lint:
 		go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest; \
 	fi
 	golangci-lint run
+
+swagger:
+	@if ! command -v swag &> /dev/null; then \
+		echo "swag not found, installing..."; \
+		go install github.com/swaggo/swag/cmd/swag@latest; \
+	fi
+	swag init -g cmd/api/main.go -o docs/
 
