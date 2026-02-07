@@ -10,3 +10,6 @@ docs/
 
 # Entrypoint
 cmd/api/main.go
+
+# Test utilities (BDD helpers, not production code)
+test/
