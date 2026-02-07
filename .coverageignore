@@ -1,0 +1,12 @@
+# Files and directories to exclude from code coverage
+# One pattern per line
+# Comments start with #
+
+# Bootstrap/DI wiring - tested via integration tests
+internal/bootstrap/
+
+# Documentation
+docs/
+
+# Entrypoint
+cmd/api/main.go

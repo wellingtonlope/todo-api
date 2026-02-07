@@ -28,10 +28,10 @@ jobs:
       - name: Run tests with coverage
         run: go test ./... -coverprofile=coverage.out -count=1 -v
 
-      - name: Filter coverage (exclude bootstrap)
+      - name: Filter coverage (apply .coverageignore)
         run: |
-          grep -v "internal/bootstrap/" coverage.out > coverage.filtered.out
-          mv coverage.filtered.out coverage.out
+          chmod +x scripts/filter-coverage.sh
+          ./scripts/filter-coverage.sh coverage.out
 
       - name: Generate coverage report
         run: go tool cover -func=coverage.out
