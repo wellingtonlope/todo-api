@@ -4,7 +4,7 @@ This document provides guidelines for agentic coding assistants working on this 
 
 ## Project Overview
 
-This is a Todo API built with Go 1.25.6, using Echo for HTTP, GORM with SQLite for persistence, and Uber FX for dependency injection. The project follows Clean Architecture with clear separation between domain, application (usecase), and infrastructure layers.
+This is a Todo API built with Go 1.25, using Echo for HTTP, GORM with SQLite for persistence, and Uber FX for dependency injection. The project follows Clean Architecture with clear separation between domain, application (usecase), and infrastructure layers.
 
 ## Quick Reference
 
@@ -24,7 +24,7 @@ make swagger
 ```
 
 ### Prerequisites
-- Go 1.25.6 installed
+- Go 1.25 installed
 - Tools: `gofumpt`, `golangci-lint`, `swag`
 - See [DEVELOPMENT.md](docs/DEVELOPMENT.md) for installation details
 

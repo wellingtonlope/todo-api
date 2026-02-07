@@ -4,7 +4,7 @@ This document contains architectural patterns, design guidelines, and project st
 
 ## Project Overview
 
-This is a Todo API built with Go 1.25.6, using Echo for HTTP, GORM with SQLite for persistence, and Uber FX for dependency injection. The project follows Clean Architecture with clear separation between domain, application (usecase), and infrastructure layers.
+This is a Todo API built with Go 1.25, using Echo for HTTP, GORM with SQLite for persistence, and Uber FX for dependency injection. The project follows Clean Architecture with clear separation between domain, application (usecase), and infrastructure layers.
 
 ## Design Patterns
 

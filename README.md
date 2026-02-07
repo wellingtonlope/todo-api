@@ -26,7 +26,7 @@ This project follows **Clean Architecture** with three layers:
 
 ## Tech Stack
 
-- **Go 1.25.6**
+- **Go 1.25**
 - **Echo** - HTTP web framework
 - **GORM** - ORM for database operations
 - **SQLite** - Database (easily swappable)
@@ -38,7 +38,7 @@ This project follows **Clean Architecture** with three layers:
 
 ### Prerequisites
 
-- Go 1.25.6+
+- Go 1.25+
 - Make (optional)
 
 ### Installation
