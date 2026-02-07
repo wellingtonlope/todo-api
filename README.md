@@ -3,7 +3,7 @@
 ![CI](https://github.com/wellingtonlope/todo-api/workflows/CI/badge.svg)
 ![Go Version](https://img.shields.io/github/go-mod/go-version/wellingtonlope/todo-api)
 ![License](https://img.shields.io/badge/license-MIT-blue)
-![Codecov](https://codecov.io/gh/wellingtonlope/todo-api/branch/main/graph/badge.svg)
+![Coverage](https://raw.githubusercontent.com/wiki/wellingtonlope/todo-api/coverage.svg)
 ![Tests](https://img.shields.io/badge/tests-passing-brightgreen)
 
 A RESTful API for managing todo items built with Go, following Clean Architecture principles.
