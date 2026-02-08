@@ -13,6 +13,7 @@ func TestNewTodo(t *testing.T) {
 	exampleTitle := "title example"
 	exampleDescription := "description example"
 	exampleDate, _ := time.Parse(time.DateOnly, "2024-01-01")
+	exampleDateUpdated, _ := time.Parse(time.DateOnly, "2024-01-02")
 	exampleTodo := domain.Todo{
 		Title:       exampleTitle,
 		Description: exampleDescription,
@@ -74,6 +75,31 @@ func TestNewTodo(t *testing.T) {
 			dueDate:     nil,
 			result:      exampleTodo,
 			err:         nil,
+		},
+		{
+			name:        "should fail when due date is before created date",
+			title:       exampleTitle,
+			description: exampleDescription,
+			date:        exampleDateUpdated,
+			dueDate:     &exampleDate,
+			result:      domain.Todo{},
+			err:         fmt.Errorf("%w: due date must be in the future", domain.ErrTodoInvalidInput),
+		},
+		{
+			name:        "should create todo with valid due date",
+			title:       exampleTitle,
+			description: exampleDescription,
+			date:        exampleDate,
+			dueDate:     &exampleDateUpdated,
+			result: domain.Todo{
+				Title:       exampleTitle,
+				Description: exampleDescription,
+				Status:      domain.TodoStatusPending,
+				DueDate:     &exampleDateUpdated,
+				CreatedAt:   exampleDate,
+				UpdatedAt:   exampleDate,
+			},
+			err: nil,
 		},
 	}
 	for _, tc := range testCases {
@@ -167,6 +193,33 @@ func TestTodo_Update(t *testing.T) {
 			todo:        exampleTodo,
 			result:      exampleTodoUpdated,
 			err:         nil,
+		},
+		{
+			name:        "should fail when due date is before updated date",
+			title:       exampleTitleUpdated,
+			description: exampleDescriptionUpdated,
+			date:        exampleDateUpdated,
+			dueDate:     &exampleDate,
+			todo:        exampleTodo,
+			result:      domain.Todo{},
+			err:         fmt.Errorf("%w: due date must be in the future", domain.ErrTodoInvalidInput),
+		},
+		{
+			name:        "should update todo with valid due date",
+			title:       exampleTitleUpdated,
+			description: exampleDescriptionUpdated,
+			date:        exampleDateUpdated,
+			dueDate:     &exampleDateUpdated,
+			todo:        exampleTodo,
+			result: domain.Todo{
+				Title:       exampleTitleUpdated,
+				Description: exampleDescriptionUpdated,
+				Status:      domain.TodoStatusPending,
+				DueDate:     &exampleDateUpdated,
+				CreatedAt:   exampleDate,
+				UpdatedAt:   exampleDateUpdated,
+			},
+			err: nil,
 		},
 	}
 	for _, tc := range testCases {
