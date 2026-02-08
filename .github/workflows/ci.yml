@@ -45,11 +45,10 @@ jobs:
       - name: Update coverage report and badge
         uses: ncruces/go-coverage-report@v0
         with:
+          coverage-file: coverage.out
           report: true
           chart: true
           amend: true
-          cover: coverage.out
-          filters: .coverageignore
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         continue-on-error: true
 
