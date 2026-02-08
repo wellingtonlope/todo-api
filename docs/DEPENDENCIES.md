@@ -10,7 +10,8 @@ This document contains information about the key dependencies and technology sta
 
 ### Database & Persistence
 - **GORM** - ORM (Object-Relational Mapping) for database operations
-- **SQLite** - Database engine (configurable, can be swapped for PostgreSQL, MySQL, etc.)
+- **MySQL 8.0** - Production-ready database engine
+- **MySQL Driver** - GORM driver for MySQL connectivity
 
 ### Dependency Injection
 - **Uber FX** - Dependency injection framework for Go applications
@@ -45,7 +46,8 @@ go.uber.org/fx                       # Dependency injection
 ### Data Layer
 ```
 gorm.io/gorm                         # ORM
-gorm.io/driver/sqlite                # SQLite driver
+gorm.io/driver/mysql                 # MySQL driver
+github.com/go-sql-driver/mysql       # MySQL database driver
 ```
 
 ### Testing

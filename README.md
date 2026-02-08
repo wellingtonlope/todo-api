@@ -22,14 +22,14 @@ This project follows **Clean Architecture** with three layers:
 
 - **Domain**: Business entities and rules (pure Go, no dependencies)
 - **Application**: Use cases and business logic orchestration
-- **Infrastructure**: HTTP handlers (Echo), database (GORM + SQLite), and DI (Uber FX)
+- **Infrastructure**: HTTP handlers (Echo), database (GORM + MySQL), and DI (Uber FX)
 
 ## Tech Stack
 
 - **Go 1.25**
 - **Echo** - HTTP web framework
 - **GORM** - ORM for database operations
-- **SQLite** - Database (easily swappable)
+- **MySQL 8.0** - Database (production-ready)
 - **Uber FX** - Dependency injection
 - **Swagger** - API documentation
 - **Testify + Godog** - Testing (unit and BDD)
@@ -97,13 +97,18 @@ make all        # Format + lint + test
 ## Docker
 
 ```bash
-# Run with Docker Compose
+# Run with Docker Compose (includes MySQL)
 docker compose up
 
 # Or build and run manually
 docker build -t todo-api .
 docker run -p 1323:1323 todo-api
 ```
+
+The Docker Compose setup includes:
+- **todo-api**: Application container
+- **mysql**: MySQL 8.0 database container
+- **mysql_data**: Persistent volume for database data
 
 ## Project Structure
 
@@ -143,6 +148,12 @@ Environment variables:
 |----------|-------------|---------|
 | `APP_ENV` | Application environment | `development` |
 | `PORT` | HTTP server port | `1323` |
+| `DB_DRIVER` | Database driver | `mysql` |
+| `DB_HOST` | Database host | `mysql` |
+| `DB_PORT` | Database port | `3306` |
+| `DB_USER` | Database user | `todo_user` |
+| `DB_PASSWORD` | Database password | `todo_password` |
+| `DB_NAME` | Database name | `todo_api` |
 
 ## Documentation
 
