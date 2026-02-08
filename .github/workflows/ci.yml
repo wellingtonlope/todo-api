@@ -49,6 +49,7 @@ jobs:
           chart: true
           amend: true
           cover: coverage.out
+          filters: .coverageignore
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         continue-on-error: true
 
