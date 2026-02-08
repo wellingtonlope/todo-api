@@ -9,7 +9,10 @@ func TestFXOptions() fx.Option {
 	return fx.Options(
 		// Test configuration
 		fx.Supply(Config{
-			DatabasePath:  ":memory:",
+			Database: DatabaseConfig{
+				Driver: "sqlite",
+				Path:   ":memory:",
+			},
 			WithLifecycle: false,
 			WithSwagger:   false,
 			Port:          "",

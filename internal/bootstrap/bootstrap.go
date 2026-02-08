@@ -1,6 +1,8 @@
 package bootstrap
 
 import (
+	"os"
+
 	"go.uber.org/fx"
 )
 
@@ -9,10 +11,17 @@ func FXOptions() fx.Option {
 	return fx.Options(
 		// Production configuration
 		fx.Supply(Config{
-			DatabasePath:  "todo.db",
+			Database: DatabaseConfig{
+				Driver:   getEnv("DB_DRIVER", "mysql"),
+				Host:     getEnv("DB_HOST", "localhost"),
+				Port:     getEnv("DB_PORT", "3306"),
+				User:     getEnv("DB_USER", "todo_user"),
+				Password: getEnv("DB_PASSWORD", "todo_password"),
+				Database: getEnv("DB_NAME", "todo_api"),
+			},
 			WithLifecycle: true,
 			WithSwagger:   true,
-			Port:          "8080",
+			Port:          getEnv("PORT", "8080"),
 		}),
 		// Infrastructure providers (middlewares, database, handler registration)
 		InfrastructureProviders(),
@@ -23,4 +32,12 @@ func FXOptions() fx.Option {
 		// Production-specific invokes
 		fx.Invoke(provideSwaggerRegistration()),
 	)
+}
+
+// getEnv gets an environment variable with a default value
+func getEnv(key, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return defaultValue
 }

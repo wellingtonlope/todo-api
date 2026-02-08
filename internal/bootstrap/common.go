@@ -9,6 +9,7 @@ import (
 	gormRepo "github.com/wellingtonlope/todo-api/internal/infra/gorm"
 	"github.com/wellingtonlope/todo-api/internal/infra/handler"
 	"go.uber.org/fx"
+	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -53,13 +54,30 @@ func provideEchoWithLifecycle(config Config, middlewares []echo.MiddlewareFunc, 
 
 // provideDatabase creates a GORM database connection
 func provideDatabase(config Config) (*gorm.DB, error) {
-	db, err := gorm.Open(sqlite.Open(config.DatabasePath), &gorm.Config{})
+	var db *gorm.DB
+	var err error
+
+	if config.Database.Driver == "sqlite" {
+		db, err = gorm.Open(sqlite.Open(config.Database.Path), &gorm.Config{})
+	} else {
+		dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+			config.Database.User,
+			config.Database.Password,
+			config.Database.Host,
+			config.Database.Port,
+			config.Database.Database,
+		)
+		db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	}
+
 	if err != nil {
 		return nil, err
 	}
+
 	if err := db.AutoMigrate(&gormRepo.TodoModel{}); err != nil {
 		return nil, err
 	}
+
 	return db, nil
 }
 

@@ -9,5 +9,44 @@ services:
     environment:
       - APP_ENV=production
       - PORT=1323
+      - DB_DRIVER=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=todo_user
+      - DB_PASSWORD=todo_password
+      - DB_NAME=todo_api
     ports:
       - "1323:1323"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - todo-network
+
+  mysql:
+    container_name: todo-mysql
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: todo_api
+      MYSQL_USER: todo_user
+      MYSQL_PASSWORD: todo_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - todo-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  mysql_data:
+
+networks:
+  todo-network:
+    driver: bridge
