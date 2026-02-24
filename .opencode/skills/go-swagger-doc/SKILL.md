@@ -1,13 +1,7 @@
 ---
 name: go-swagger-doc
-description: Add or update Swagger/OpenAPI documentation for handlers
+description: Add Swagger/OpenAPI annotations
 ---
-
-## What I do
-Add Swagger annotations to HTTP handlers.
-
-## When to use me
-Creating or modifying API endpoints.
 
 ## Annotations
 ```go
@@ -16,17 +10,19 @@ Creating or modifying API endpoints.
 // @Tags todos
 // @Accept json
 // @Produce json
-// @Param id path string true "Todo ID"
-// @Param todo body createInput true "Todo data"
-// @Success 200 {object} todoOutput
-// @Success 201 {object} todoOutput
+// @Param id path string true "ID"
+// @Success 200 {object} Output
 // @Failure 400 {object} ErrorResponse
-// @Failure 404 {object} ErrorResponse
-// @Router /todos [get|post|put|delete]
+// @Router /todos/{id} [get]
+```
+
+## Commands
+```bash
+make swagger
+# or: swag init -g cmd/api/main.go -o docs/
 ```
 
 ## Rules
-1. Add above the Handle method
+1. Add above Handle method
 2. Use correct HTTP method in @Router
-3. Define response types (use existing todoOutput or create new)
-4. Regenerate docs: `make swagger` (preferred) or `swag init -g cmd/api/main.go -o docs/`
+3. Define response types

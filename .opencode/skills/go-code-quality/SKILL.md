@@ -1,32 +1,16 @@
 ---
 name: go-code-quality
-description: Run formatting and linting before commits
+description: Format and lint code
 ---
 
-## What I do
-Ensure code quality with formatting and linting.
-
-## When to use me
-Before committing changes.
-
-## Commands (use Makefile)
+## Commands
 ```bash
-# Format code
-make format
-
-# Lint code
-make lint
-
-# Run both + tests
-make all
-
-# Direct commands (avoid if possible)
-gofumpt -w .
-golangci-lint run
+make format   # gofumpt
+make lint     # golangci-lint
+make test     # run tests
 ```
 
 ## Rules
-1. Always run format before commit
+1. Run format before commit
 2. Fix all lint errors
-3. Run tests after: `make test`
-4. Ensure no unused imports
+3. Ensure no unused imports

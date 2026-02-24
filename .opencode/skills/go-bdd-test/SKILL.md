@@ -1,21 +1,9 @@
 ---
 name: go-bdd-test
-description: Add BDD tests using godog/cucumber framework
+description: Add BDD tests using godog
 ---
 
-## What I do
-Create BDD tests with Gherkin syntax and godog steps.
-
-## When to use me
-Adding integration/acceptance tests.
-
 ## Pattern
-1. Create step file: `test/steps/<feature>_steps.go`
-2. Define context struct embedding BaseTestContext
-3. Implement step methods
-4. Register in InitializeScenario
-
-## Structure
 ```go
 type XxxContext struct { BaseTestContext }
 
@@ -25,12 +13,9 @@ func (c *XxxContext) InitializeScenario(ctx *godog.ScenarioContext) {
 }
 ```
 
-## Commands (use Makefile)
+## Commands
 ```bash
-# Run BDD tests
 make test
-
-# Run specific test
 go test ./test -v
 ```
 
