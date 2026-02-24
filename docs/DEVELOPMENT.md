@@ -9,6 +9,9 @@ This document contains development commands, testing patterns, and code quality 
 make test
 go test ./... -count=1
 
+# Run format + lint + test
+make all
+
 # Run a single test
 go test ./internal/app/usecase/todo -run TestCreate_Handle -v
 

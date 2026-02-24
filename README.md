@@ -161,6 +161,7 @@ Environment variables:
 - [Development](docs/DEVELOPMENT.md) - Build and testing guide
 - [Dependencies](docs/DEPENDENCIES.md) - Technology stack details
 - [Style Guide](docs/STYLE_GUIDE.md) - Coding conventions
+- [Contributing](CONTRIBUTING.md) - Commit conventions and contribution guidelines
 
 ## License
 
