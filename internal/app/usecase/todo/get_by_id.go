@@ -13,7 +13,7 @@ var ErrGetByIDStoreNotFound = errors.New("todo not found by ID")
 
 type (
 	GetByIDStore interface {
-		GetByID(ctx context.Context, id string) (domain.Todo, error)
+		GetByID(context.Context, string) (domain.Todo, error)
 	}
 	GetByID interface {
 		Handle(ctx context.Context, id string) (TodoOutput, error)

@@ -9,10 +9,10 @@ import (
 
 type (
 	ListStore interface {
-		List(ctx context.Context, status *domain.TodoStatus) ([]domain.Todo, error)
+		List(context.Context, *domain.TodoStatus) ([]domain.Todo, error)
 	}
 	List interface {
-		Handle(ctx context.Context, input ListInput) ([]TodoOutput, error)
+		Handle(context.Context, ListInput) ([]TodoOutput, error)
 	}
 	ListInput struct {
 		Status *domain.TodoStatus

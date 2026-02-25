@@ -20,8 +20,8 @@ type (
 		DueDate     *time.Time
 	}
 	UpdateStore interface {
-		GetByID(ctx context.Context, id string) (domain.Todo, error)
-		Update(ctx context.Context, todo domain.Todo) (domain.Todo, error)
+		GetByID(context.Context, string) (domain.Todo, error)
+		Update(context.Context, domain.Todo) (domain.Todo, error)
 	}
 	Update interface {
 		Handle(context.Context, UpdateInput) (TodoOutput, error)

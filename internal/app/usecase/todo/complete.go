@@ -16,8 +16,8 @@ type (
 		ID string
 	}
 	CompleteStore interface {
-		GetByID(ctx context.Context, id string) (domain.Todo, error)
-		Update(ctx context.Context, todo domain.Todo) (domain.Todo, error)
+		GetByID(context.Context, string) (domain.Todo, error)
+		Update(context.Context, domain.Todo) (domain.Todo, error)
 	}
 	Complete interface {
 		Handle(context.Context, CompleteInput) (TodoOutput, error)

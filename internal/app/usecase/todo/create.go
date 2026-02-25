@@ -15,7 +15,7 @@ type (
 		DueDate     *time.Time
 	}
 	CreateStore interface {
-		Create(ctx context.Context, todo domain.Todo) (domain.Todo, error)
+		Create(context.Context, domain.Todo) (domain.Todo, error)
 	}
 	Create interface {
 		Handle(context.Context, CreateInput) (TodoOutput, error)

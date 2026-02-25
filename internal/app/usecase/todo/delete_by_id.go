@@ -12,7 +12,7 @@ var ErrDeleteByIDStoreNotFound = errors.New("todo not found by ID")
 
 type (
 	DeleteByIDStore interface {
-		DeleteByID(ctx context.Context, id string) error
+		DeleteByID(context.Context, string) error
 	}
 	DeleteByID interface {
 		Handle(ctx context.Context, id string) error
