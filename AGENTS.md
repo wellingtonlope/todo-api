@@ -34,6 +34,8 @@ Use `$skill-name` or let the agent auto-trigger:
 | `go-swagger-doc` | "swagger", "openapi" | API documentation |
 | `conventional-commit` | "commit" | Commit message format |
 
+Skills are loaded from: `.agents/skills/`
+
 ## Documentation
 
 - [DEVELOPMENT.md](docs/DEVELOPMENT.md) - Build, testing, tooling
