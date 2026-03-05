@@ -7,15 +7,20 @@ import (
 	"time"
 )
 
+// ErrTodoInvalidInput is returned when the todo input is invalid.
 var ErrTodoInvalidInput = errors.New("todo invalid input")
 
+// TodoStatus represents the current status of a todo.
 type TodoStatus string
 
 const (
-	TodoStatusPending   TodoStatus = "pending"
+	// TodoStatusPending indicates the todo has not been completed yet.
+	TodoStatusPending TodoStatus = "pending"
+	// TodoStatusCompleted indicates the todo has been completed.
 	TodoStatusCompleted TodoStatus = "completed"
 )
 
+// Todo represents a task or item to be done.
 type Todo struct {
 	ID          string
 	Title       string
@@ -26,6 +31,19 @@ type Todo struct {
 	UpdatedAt   time.Time
 }
 
+// NewTodo creates a new Todo with the given parameters.
+// It validates that title is not empty and date is not zero.
+// If dueDate is provided, it must be after date.
+//
+// Parameters:
+//   - title: the todo title (required)
+//   - description: the todo description (optional)
+//   - date: the current timestamp (required, must not be zero)
+//   - dueDate: optional deadline, must be after date if provided
+//
+// Returns:
+//   - Todo: the created todo instance
+//   - error: ErrTodoInvalidInput if validation fails
 func NewTodo(title, description string, date time.Time, dueDate *time.Time) (Todo, error) {
 	title = strings.TrimSpace(title)
 	description = strings.TrimSpace(description)
@@ -48,6 +66,19 @@ func NewTodo(title, description string, date time.Time, dueDate *time.Time) (Tod
 	}, nil
 }
 
+// Update modifies the todo with new values.
+// It validates that title is not empty and date is not zero.
+// If dueDate is provided, it must be after date.
+//
+// Parameters:
+//   - title: the new todo title (required)
+//   - description: the new todo description (optional)
+//   - date: the current timestamp (required, must not be zero)
+//   - dueDate: optional deadline, must be after date if provided
+//
+// Returns:
+//   - Todo: the updated todo instance
+//   - error: ErrTodoInvalidInput if validation fails
 func (t Todo) Update(title, description string, date time.Time, dueDate *time.Time) (Todo, error) {
 	title = strings.TrimSpace(title)
 	description = strings.TrimSpace(description)
@@ -67,12 +98,26 @@ func (t Todo) Update(title, description string, date time.Time, dueDate *time.Ti
 	return t, nil
 }
 
+// MarkAsCompleted marks the todo as completed with the given date.
+//
+// Parameters:
+//   - date: the current timestamp
+//
+// Returns:
+//   - Todo: the updated todo with status set to completed
 func (t Todo) MarkAsCompleted(date time.Time) Todo {
 	t.Status = TodoStatusCompleted
 	t.UpdatedAt = date
 	return t
 }
 
+// MarkAsPending marks the todo as pending with the given date.
+//
+// Parameters:
+//   - date: the current timestamp
+//
+// Returns:
+//   - Todo: the updated todo with status set to pending
 func (t Todo) MarkAsPending(date time.Time) Todo {
 	t.Status = TodoStatusPending
 	t.UpdatedAt = date
