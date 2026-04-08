@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/wellingtonlope/todo-api/internal/app/usecase"
-	"github.com/wellingtonlope/todo-api/internal/domain"
 )
 
 var ErrCompleteStoreNotFound = errors.New("todo not found by ID")
@@ -15,11 +14,8 @@ type (
 	CompleteInput struct {
 		ID string
 	}
-	CompleteStore interface {
-		GetByID(context.Context, string) (domain.Todo, error)
-		Update(context.Context, domain.Todo) (domain.Todo, error)
-	}
-	Complete interface {
+	CompleteStore = TodoUpdater
+	Complete      interface {
 		Handle(context.Context, CompleteInput) (TodoOutput, error)
 	}
 	complete struct {

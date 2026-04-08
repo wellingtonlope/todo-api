@@ -24,9 +24,7 @@ func CommonProviders() fx.Option {
 			fx.As(new(todo.ListStore)),
 			fx.As(new(todo.GetByIDStore)),
 			fx.As(new(todo.DeleteByIDStore)),
-			fx.As(new(todo.UpdateStore)),
-			fx.As(new(todo.CompleteStore)),
-			fx.As(new(todo.MarkAsPendingStore)),
+			fx.As(new(todo.TodoUpdater)),
 		),
 		// Use case providers
 		fx.Annotate(

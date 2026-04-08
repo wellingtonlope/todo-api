@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/wellingtonlope/todo-api/internal/app/usecase"
-	"github.com/wellingtonlope/todo-api/internal/domain"
 )
 
 var ErrUpdateStoreNotFound = errors.New("todo not found by ID")
@@ -19,11 +18,8 @@ type (
 		Description string
 		DueDate     *time.Time
 	}
-	UpdateStore interface {
-		GetByID(context.Context, string) (domain.Todo, error)
-		Update(context.Context, domain.Todo) (domain.Todo, error)
-	}
-	Update interface {
+	UpdateStore = TodoUpdater
+	Update      interface {
 		Handle(context.Context, UpdateInput) (TodoOutput, error)
 	}
 	update struct {

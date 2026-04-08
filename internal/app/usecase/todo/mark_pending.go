@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/wellingtonlope/todo-api/internal/app/usecase"
-	"github.com/wellingtonlope/todo-api/internal/domain"
 )
 
 var ErrMarkPendingStoreNotFound = errors.New("todo not found by ID")
@@ -15,11 +14,8 @@ type (
 	MarkAsPendingInput struct {
 		ID string
 	}
-	MarkAsPendingStore interface {
-		GetByID(context.Context, string) (domain.Todo, error)
-		Update(context.Context, domain.Todo) (domain.Todo, error)
-	}
-	MarkAsPending interface {
+	MarkAsPendingStore = TodoUpdater
+	MarkAsPending      interface {
 		Handle(context.Context, MarkAsPendingInput) (TodoOutput, error)
 	}
 	markAsPending struct {
