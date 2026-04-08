@@ -31,6 +31,23 @@ type Todo struct {
 	UpdatedAt   time.Time
 }
 
+// validateTodoInput validates the todo input fields.
+// It trims whitespace from title and description, checks title is not empty,
+// date is not zero, and dueDate is after date if provided.
+func validateTodoInput(title string, date time.Time, dueDate *time.Time) error {
+	title = strings.TrimSpace(title)
+	if title == "" {
+		return fmt.Errorf("%w: title", ErrTodoInvalidInput)
+	}
+	if date.IsZero() {
+		return fmt.Errorf("%w: date", ErrTodoInvalidInput)
+	}
+	if dueDate != nil && dueDate.Before(date) {
+		return fmt.Errorf("%w: due date must be in the future", ErrTodoInvalidInput)
+	}
+	return nil
+}
+
 // NewTodo creates a new Todo with the given parameters.
 // It validates that title is not empty and date is not zero.
 // If dueDate is provided, it must be after date.
@@ -45,17 +62,11 @@ type Todo struct {
 //   - Todo: the created todo instance
 //   - error: ErrTodoInvalidInput if validation fails
 func NewTodo(title, description string, date time.Time, dueDate *time.Time) (Todo, error) {
+	if err := validateTodoInput(title, date, dueDate); err != nil {
+		return Todo{}, err
+	}
 	title = strings.TrimSpace(title)
 	description = strings.TrimSpace(description)
-	if title == "" {
-		return Todo{}, fmt.Errorf("%w: title", ErrTodoInvalidInput)
-	}
-	if date.IsZero() {
-		return Todo{}, fmt.Errorf("%w: date", ErrTodoInvalidInput)
-	}
-	if dueDate != nil && dueDate.Before(date) {
-		return Todo{}, fmt.Errorf("%w: due date must be in the future", ErrTodoInvalidInput)
-	}
 	return Todo{
 		Title:       title,
 		Description: description,
@@ -80,17 +91,11 @@ func NewTodo(title, description string, date time.Time, dueDate *time.Time) (Tod
 //   - Todo: the updated todo instance
 //   - error: ErrTodoInvalidInput if validation fails
 func (t Todo) Update(title, description string, date time.Time, dueDate *time.Time) (Todo, error) {
+	if err := validateTodoInput(title, date, dueDate); err != nil {
+		return Todo{}, err
+	}
 	title = strings.TrimSpace(title)
 	description = strings.TrimSpace(description)
-	if title == "" {
-		return Todo{}, fmt.Errorf("%w: title", ErrTodoInvalidInput)
-	}
-	if date.IsZero() {
-		return Todo{}, fmt.Errorf("%w: date", ErrTodoInvalidInput)
-	}
-	if dueDate != nil && dueDate.Before(date) {
-		return Todo{}, fmt.Errorf("%w: due date must be in the future", ErrTodoInvalidInput)
-	}
 	t.Title = title
 	t.Description = description
 	t.DueDate = dueDate
