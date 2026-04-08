@@ -27,14 +27,14 @@ func TestGetByID_Handle(t *testing.T) {
 			store: func() *getByIDStoreMock {
 				m := new(getByIDStoreMock)
 				m.On("GetByID", context.TODO(), "123").
-					Return(domain.Todo{}, todo.ErrGetByIDStoreNotFound).Once()
+					Return(domain.Todo{}, domain.ErrTodoNotFound).Once()
 				return m
 			}(),
 			ctx:    context.TODO(),
 			id:     "123",
 			result: todo.TodoOutput{},
 			err: usecase.NewError("todo not found with id 123",
-				todo.ErrGetByIDStoreNotFound, usecase.ErrorTypeNotFound),
+				domain.ErrTodoNotFound, usecase.ErrorTypeNotFound),
 		},
 		{
 			name: "should fail when store fails",

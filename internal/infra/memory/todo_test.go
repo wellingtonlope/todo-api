@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	todoUC "github.com/wellingtonlope/todo-api/internal/app/usecase/todo"
 	"github.com/wellingtonlope/todo-api/internal/domain"
 )
 
@@ -80,7 +79,7 @@ func TestGetByID(t *testing.T) {
 		err      error
 	}{
 		{"existing ID", "123", todo, nil},
-		{"non-existing ID", "999", domain.Todo{}, todoUC.ErrGetByIDStoreNotFound},
+		{"non-existing ID", "999", domain.Todo{}, domain.ErrTodoNotFound},
 	}
 
 	for _, tt := range tests {
@@ -102,7 +101,7 @@ func TestDeleteByID(t *testing.T) {
 	assert.Len(t, repo.todos, 0)
 
 	err = repo.DeleteByID(context.Background(), "999") // non-existing
-	assert.Equal(t, todoUC.ErrDeleteByIDStoreNotFound, err)
+	assert.Equal(t, domain.ErrTodoNotFound, err)
 }
 
 func TestUpdate(t *testing.T) {
@@ -118,5 +117,5 @@ func TestUpdate(t *testing.T) {
 	assert.Equal(t, updatedTodo, retrieved)
 
 	_, err = repo.Update(context.Background(), domain.Todo{ID: "999", Title: "Non-existing"})
-	assert.Equal(t, todoUC.ErrUpdateStoreNotFound, err)
+	assert.Equal(t, domain.ErrTodoNotFound, err)
 }

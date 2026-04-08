@@ -6,9 +6,8 @@ import (
 	"fmt"
 
 	"github.com/wellingtonlope/todo-api/internal/app/usecase"
+	"github.com/wellingtonlope/todo-api/internal/domain"
 )
-
-var ErrCompleteStoreNotFound = errors.New("todo not found by ID")
 
 type (
 	CompleteInput struct {
@@ -34,7 +33,7 @@ func NewComplete(store CompleteStore, clock usecase.Clock) *complete {
 func (uc *complete) Handle(ctx context.Context, input CompleteInput) (TodoOutput, error) {
 	todo, err := uc.store.GetByID(ctx, input.ID)
 	if err != nil {
-		if errors.Is(err, ErrGetByIDStoreNotFound) {
+		if errors.Is(err, domain.ErrTodoNotFound) {
 			return TodoOutput{}, usecase.NewError(fmt.Sprintf("todo not found with id %s", input.ID),
 				err, usecase.ErrorTypeNotFound)
 		}
@@ -44,7 +43,7 @@ func (uc *complete) Handle(ctx context.Context, input CompleteInput) (TodoOutput
 	todo = todo.MarkAsCompleted(uc.clock.Now())
 	todo, err = uc.store.Update(ctx, todo)
 	if err != nil {
-		if errors.Is(err, ErrCompleteStoreNotFound) {
+		if errors.Is(err, domain.ErrTodoNotFound) {
 			return TodoOutput{}, usecase.NewError(fmt.Sprintf("todo not found with id %s", input.ID),
 				err, usecase.ErrorTypeNotFound)
 		}

@@ -6,9 +6,8 @@ import (
 	"fmt"
 
 	"github.com/wellingtonlope/todo-api/internal/app/usecase"
+	"github.com/wellingtonlope/todo-api/internal/domain"
 )
-
-var ErrDeleteByIDStoreNotFound = errors.New("todo not found by ID")
 
 type (
 	DeleteByIDStore interface {
@@ -29,7 +28,7 @@ func NewDeleteByID(store DeleteByIDStore) *deleteByID {
 func (uc *deleteByID) Handle(ctx context.Context, id string) error {
 	err := uc.store.DeleteByID(ctx, id)
 	if err != nil {
-		if errors.Is(err, ErrDeleteByIDStoreNotFound) {
+		if errors.Is(err, domain.ErrTodoNotFound) {
 			return usecase.NewError(fmt.Sprintf("todo not found with id %s", id),
 				err, usecase.ErrorTypeNotFound)
 		}

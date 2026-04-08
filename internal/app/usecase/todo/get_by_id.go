@@ -9,8 +9,6 @@ import (
 	"github.com/wellingtonlope/todo-api/internal/domain"
 )
 
-var ErrGetByIDStoreNotFound = errors.New("todo not found by ID")
-
 type (
 	GetByIDStore interface {
 		GetByID(context.Context, string) (domain.Todo, error)
@@ -30,7 +28,7 @@ func NewGetByID(store GetByIDStore) *getByID {
 func (uc *getByID) Handle(ctx context.Context, id string) (TodoOutput, error) {
 	todo, err := uc.store.GetByID(ctx, id)
 	if err != nil {
-		if errors.Is(err, ErrGetByIDStoreNotFound) {
+		if errors.Is(err, domain.ErrTodoNotFound) {
 			return TodoOutput{}, usecase.NewError(fmt.Sprintf("todo not found with id %s", id),
 				err, usecase.ErrorTypeNotFound)
 		}

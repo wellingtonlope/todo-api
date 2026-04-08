@@ -29,7 +29,7 @@ func TestMarkAsPending_Handle(t *testing.T) {
 			markAsPendingStore: func() *markAsPendingStoreMock {
 				m := new(markAsPendingStoreMock)
 				m.On("GetByID", context.TODO(), "123").
-					Return(domain.Todo{}, todo.ErrGetByIDStoreNotFound).Once()
+					Return(domain.Todo{}, domain.ErrTodoNotFound).Once()
 				return m
 			}(),
 			clock: func() *clockMock {
@@ -42,7 +42,7 @@ func TestMarkAsPending_Handle(t *testing.T) {
 			},
 			result: todo.TodoOutput{},
 			err: usecase.NewError("todo not found with id 123",
-				todo.ErrGetByIDStoreNotFound, usecase.ErrorTypeNotFound),
+				domain.ErrTodoNotFound, usecase.ErrorTypeNotFound),
 		},
 		{
 			name: "should fail when repository fails",

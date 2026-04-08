@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	todoUC "github.com/wellingtonlope/todo-api/internal/app/usecase/todo"
 	"github.com/wellingtonlope/todo-api/internal/domain"
 	"gorm.io/gorm"
 )
@@ -46,7 +45,7 @@ func (r *todoRepository) GetByID(ctx context.Context, id string) (domain.Todo, e
 	var model TodoModel
 	if err := r.db.WithContext(ctx).First(&model, "id = ?", id).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return domain.Todo{}, todoUC.ErrGetByIDStoreNotFound
+			return domain.Todo{}, domain.ErrTodoNotFound
 		}
 		return domain.Todo{}, err
 	}
@@ -59,7 +58,7 @@ func (r *todoRepository) DeleteByID(ctx context.Context, id string) error {
 		return result.Error
 	}
 	if result.RowsAffected == 0 {
-		return todoUC.ErrDeleteByIDStoreNotFound
+		return domain.ErrTodoNotFound
 	}
 	return nil
 }
@@ -71,7 +70,7 @@ func (r *todoRepository) Update(ctx context.Context, todo domain.Todo) (domain.T
 		return domain.Todo{}, result.Error
 	}
 	if result.RowsAffected == 0 {
-		return domain.Todo{}, todoUC.ErrUpdateStoreNotFound
+		return domain.Todo{}, domain.ErrTodoNotFound
 	}
 	return toDomain(model), nil
 }

@@ -30,7 +30,7 @@ func TestUpdate_Handle(t *testing.T) {
 			updateStore: func() *updateStoreMock {
 				m := new(updateStoreMock)
 				m.On("GetByID", context.TODO(), "123").
-					Return(domain.Todo{}, todo.ErrGetByIDStoreNotFound).Once()
+					Return(domain.Todo{}, domain.ErrTodoNotFound).Once()
 				return m
 			}(),
 			clock: newClockMock(),
@@ -42,7 +42,7 @@ func TestUpdate_Handle(t *testing.T) {
 			},
 			result: todo.TodoOutput{},
 			err: usecase.NewError("todo not found with id 123",
-				todo.ErrGetByIDStoreNotFound, usecase.ErrorTypeNotFound),
+				domain.ErrTodoNotFound, usecase.ErrorTypeNotFound),
 		},
 		{
 			name: "should fail when get by id fails",
@@ -113,7 +113,7 @@ func TestUpdate_Handle(t *testing.T) {
 					Description: "example description updated",
 					CreatedAt:   exampleDate,
 					UpdatedAt:   exampleDateUpdated,
-				}).Return(domain.Todo{}, todo.ErrUpdateStoreNotFound).Once()
+				}).Return(domain.Todo{}, domain.ErrTodoNotFound).Once()
 				return m
 			}(),
 			clock: func() *clockMock {
@@ -129,7 +129,7 @@ func TestUpdate_Handle(t *testing.T) {
 			},
 			result: todo.TodoOutput{},
 			err: usecase.NewError("todo not found with id 123",
-				todo.ErrUpdateStoreNotFound, usecase.ErrorTypeNotFound),
+				domain.ErrTodoNotFound, usecase.ErrorTypeNotFound),
 		},
 		{
 			name: "should fail when update store fails",

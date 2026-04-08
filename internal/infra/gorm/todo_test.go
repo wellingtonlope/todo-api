@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	todoUC "github.com/wellingtonlope/todo-api/internal/app/usecase/todo"
 	"github.com/wellingtonlope/todo-api/internal/domain"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -105,7 +104,7 @@ func TestGetByID(t *testing.T) {
 		err      error
 	}{
 		{"existing ID", created.ID, created, nil},
-		{"non-existing ID", "999", domain.Todo{}, todoUC.ErrGetByIDStoreNotFound},
+		{"non-existing ID", "999", domain.Todo{}, domain.ErrTodoNotFound},
 	}
 
 	for _, tt := range tests {
@@ -127,10 +126,10 @@ func TestDeleteByID(t *testing.T) {
 	err := repo.DeleteByID(context.Background(), created.ID)
 	assert.Nil(t, err)
 	_, err = repo.GetByID(context.Background(), created.ID)
-	assert.Equal(t, todoUC.ErrGetByIDStoreNotFound, err)
+	assert.Equal(t, domain.ErrTodoNotFound, err)
 
 	err = repo.DeleteByID(context.Background(), "999") // non-existing
-	assert.Equal(t, todoUC.ErrDeleteByIDStoreNotFound, err)
+	assert.Equal(t, domain.ErrTodoNotFound, err)
 }
 
 func TestUpdate(t *testing.T) {
@@ -154,5 +153,5 @@ func TestUpdate(t *testing.T) {
 	assert.Equal(t, updatedTodo.Description, retrieved.Description)
 
 	_, err = repo.Update(context.Background(), domain.Todo{ID: "999", Title: "Non-existing"})
-	assert.Equal(t, todoUC.ErrUpdateStoreNotFound, err)
+	assert.Equal(t, domain.ErrTodoNotFound, err)
 }
