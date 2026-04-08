@@ -2,6 +2,24 @@
 
 Go Todo API - Clean Architecture with Echo, GORM, Uber FX.
 
+## Project Agents
+
+### go-dev-expert
+
+Specialized Go developer focused on code quality, simplicity, and best practices. Auto-triggered when:
+- Writing new Go code or refactoring
+- Code review requests
+- Questions about Go idioms or patterns
+
+Core principles:
+- **Simplicity first**: Prettier simple solutions over clever ones
+- **YAGNI**: Don't add functionality until needed
+- **Early returns**: Reduce nesting, improve readability
+- **Small functions**: Keep functions under 30-40 lines
+- **Critical thinking**: Question requirements, challenge assumptions
+
+See: `.agents/go-dev-expert/AGENT.md`
+
 ## Commands
 
 ```bash
