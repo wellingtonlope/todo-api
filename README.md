@@ -73,15 +73,15 @@ Access Swagger UI at: `http://localhost:1323/swagger/index.html`
 
 ## API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/todos` | Create a new todo |
-| GET | `/todos` | List all todos |
-| GET | `/todos/:id` | Get a specific todo |
-| PUT | `/todos/:id` | Update a todo |
-| DELETE | `/todos/:id` | Delete a todo |
-| PUT | `/todos/:id/complete` | Mark todo as completed |
-| PUT | `/todos/:id/pending` | Mark todo as pending |
+|   Method   |   Endpoint                  |   Description                |
+|  --------  |  ------------------------   |  -------------------------   |
+|   POST     |   `/todos`                  |   Create a new todo          |
+|   GET      |   `/todos`                  |   List all todos             |
+|   GET      |   `/todos/:id`              |   Get a specific todo        |
+|   PUT      |   `/todos/:id`              |   Update a todo              |
+|   DELETE   |   `/todos/:id`              |   Delete a todo              |
+|   PUT      |   `/todos/:id/complete`     |   Mark todo as completed     |
+|   PUT      |   `/todos/:id/pending`      |   Mark todo as pending       |
 
 ## Development Commands
 
@@ -144,16 +144,16 @@ go test ./... -cover
 
 Environment variables:
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `APP_ENV` | Application environment | `development` |
-| `PORT` | HTTP server port | `1323` |
-| `DB_DRIVER` | Database driver | `mysql` |
-| `DB_HOST` | Database host | `mysql` |
-| `DB_PORT` | Database port | `3306` |
-| `DB_USER` | Database user | `todo_user` |
-| `DB_PASSWORD` | Database password | `todo_password` |
-| `DB_NAME` | Database name | `todo_api` |
+|   Variable        |   Description                 |   Default            |
+|  ---------------  |  ---------------------------  |  ------------------  |
+|   `APP_ENV`       |   Application environment     |   `development`      |
+|   `PORT`          |   HTTP server port            |   `1323`             |
+|   `DB_DRIVER`     |   Database driver             |   `mysql`            |
+|   `DB_HOST`       |   Database host               |   `mysql`            |
+|   `DB_PORT`       |   Database port               |   `3306`             |
+|   `DB_USER`       |   Database user               |   `todo_user`        |
+|   `DB_PASSWORD`   |   Database password           |   `todo_password`    |
+|   `DB_NAME`       |   Database name               |   `todo_api`         |
 
 ## Documentation
 
