@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/cucumber/godog"
+
+	"github.com/wellingtonlope/todo-api/test/helpers"
 )
 
 type TodoListContext struct {
@@ -32,7 +34,7 @@ func (tc *TodoListContext) TheResponseShouldBeSuccessfulWithStatus(status int) e
 }
 
 func (tc *TodoListContext) TheResponseShouldContainAnEmptyListOfTodos() error {
-	var todos []TodoResponse
+	var todos []helpers.TodoResponse
 	err := json.Unmarshal(tc.Response.Body.Bytes(), &todos)
 	if err != nil {
 		return err
@@ -46,7 +48,7 @@ func (tc *TodoListContext) TheResponseShouldContainAnEmptyListOfTodos() error {
 }
 
 func (tc *TodoListContext) TheResponseShouldContainAListWithTodos(count int) error {
-	var todos []TodoResponse
+	var todos []helpers.TodoResponse
 	err := json.Unmarshal(tc.Response.Body.Bytes(), &todos)
 	if err != nil {
 		return err
@@ -103,7 +105,7 @@ func (tc *TodoListContext) TheSecondTodoShouldHaveTitleDescDueDate(title, desc, 
 }
 
 func (tc *TodoListContext) validateTodoAtIndex(index int, expectedTitle, expectedDesc, expectedDueDate string) error {
-	var todos []TodoResponse
+	var todos []helpers.TodoResponse
 	err := json.Unmarshal(tc.Response.Body.Bytes(), &todos)
 	if err != nil {
 		return err

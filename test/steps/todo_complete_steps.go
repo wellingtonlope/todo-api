@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/cucumber/godog"
+
+	"github.com/wellingtonlope/todo-api/test/helpers"
 )
 
 type TodoCompleteContext struct {
@@ -27,7 +29,7 @@ func (tc *TodoCompleteContext) ICreateTheTodo() error {
 
 	// Extract the created todo ID
 	if rec.Code == 201 {
-		var resp TodoResponse
+		var resp helpers.TodoResponse
 		err := json.Unmarshal(rec.Body.Bytes(), &resp)
 		if err == nil {
 			tc.createdTodoID = resp.ID
@@ -37,7 +39,7 @@ func (tc *TodoCompleteContext) ICreateTheTodo() error {
 }
 
 func (tc *TodoCompleteContext) TheTodoShouldBeCreatedSuccessfully() error {
-	if err := validateResponseHeaders(tc.Response, StatusCreated); err != nil {
+	if err := validateResponseHeaders(tc.Response, helpers.StatusCreated); err != nil {
 		return err
 	}
 	return validateTodoResponse(tc.Response, tc.TodoInput)
@@ -68,11 +70,11 @@ func (tc *TodoCompleteContext) IMarkTodoWithIDAsComplete(id string) error {
 }
 
 func (tc *TodoCompleteContext) TheTodoShouldBeMarkedAsCompletedSuccessfully() error {
-	if err := validateResponseHeaders(tc.Response, StatusOK); err != nil {
+	if err := validateResponseHeaders(tc.Response, helpers.StatusOK); err != nil {
 		return err
 	}
 
-	var resp TodoResponse
+	var resp helpers.TodoResponse
 	err := json.Unmarshal(tc.Response.Body.Bytes(), &resp)
 	if err != nil {
 		return err
@@ -86,11 +88,11 @@ func (tc *TodoCompleteContext) TheTodoShouldBeMarkedAsCompletedSuccessfully() er
 }
 
 func (tc *TodoCompleteContext) TheCompletionShouldFailWithNotFoundError() error {
-	return validateErrorResponse(tc.Response, StatusNotFound, "todo not found")
+	return validateErrorResponse(tc.Response, helpers.StatusNotFound, "todo not found")
 }
 
 func (tc *TodoCompleteContext) TheCompletionShouldFailWithValidationError() error {
-	return validateErrorResponse(tc.Response, StatusBadRequest, "")
+	return validateErrorResponse(tc.Response, helpers.StatusBadRequest, "")
 }
 
 func (tc *TodoCompleteContext) InitializeScenario(ctx *godog.ScenarioContext) {

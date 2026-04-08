@@ -5,36 +5,16 @@ import (
 	"fmt"
 	"net/http/httptest"
 	"strings"
-	"time"
-)
 
-const (
-	StatusCreated    = 201
-	StatusOK         = 200
-	StatusNoContent  = 204
-	StatusBadRequest = 400
-	StatusNotFound   = 404
+	"github.com/wellingtonlope/todo-api/test/helpers"
 )
-
-type TodoResponse struct {
-	ID          string     `json:"id"`
-	Title       string     `json:"title"`
-	Description string     `json:"description"`
-	Status      string     `json:"status"`
-	CreatedAt   time.Time  `json:"created_at"`
-	UpdatedAt   time.Time  `json:"updated_at"`
-	DueDate     *time.Time `json:"due_date,omitempty"`
-}
 
 func validateResponseHeaders(response *httptest.ResponseRecorder, expectedStatus int) error {
-	if response.Code != expectedStatus {
-		return fmt.Errorf("expected status %d, got %d, body: %s", expectedStatus, response.Code, response.Body.String())
-	}
-	return nil
+	return helpers.ValidateStatus(response, expectedStatus)
 }
 
 func validateTodoResponse(response *httptest.ResponseRecorder, input map[string]interface{}) error {
-	var resp TodoResponse
+	var resp helpers.TodoResponse
 	if err := json.Unmarshal(response.Body.Bytes(), &resp); err != nil {
 		return fmt.Errorf("failed to parse todo response: %w", err)
 	}
@@ -43,13 +23,13 @@ func validateTodoResponse(response *httptest.ResponseRecorder, input map[string]
 		return fmt.Errorf("todo ID should not be empty")
 	}
 
-	if resp.Title != input["title"] {
+	if title, ok := input["title"].(string); ok && resp.Title != title {
 		return fmt.Errorf("expected title '%v', got '%s'", input["title"], resp.Title)
 	}
 
-	if input["description"] != nil {
-		if resp.Description != input["description"] {
-			return fmt.Errorf("expected description '%v', got '%s'", input["description"], resp.Description)
+	if desc, ok := input["description"]; ok {
+		if resp.Description != desc {
+			return fmt.Errorf("expected description '%v', got '%s'", desc, resp.Description)
 		}
 	}
 
@@ -61,9 +41,9 @@ func validateTodoResponse(response *httptest.ResponseRecorder, input map[string]
 }
 
 func validateRetrievedTodoResponse(response *httptest.ResponseRecorder, expectedID, title, desc, dueDate string) error {
-	var resp TodoResponse
-	if err := json.Unmarshal(response.Body.Bytes(), &resp); err != nil {
-		return fmt.Errorf("failed to parse todo response: %w", err)
+	resp, err := helpers.ParseTodoResponse(response)
+	if err != nil {
+		return err
 	}
 
 	if resp.ID != expectedID {
@@ -88,7 +68,7 @@ func validateRetrievedTodoResponse(response *httptest.ResponseRecorder, expected
 }
 
 func validateErrorResponse(response *httptest.ResponseRecorder, expectedStatus int, expectedMessageContains string) error {
-	if err := validateResponseHeaders(response, expectedStatus); err != nil {
+	if err := helpers.ValidateStatus(response, expectedStatus); err != nil {
 		return err
 	}
 

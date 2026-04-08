@@ -2,6 +2,8 @@ package steps
 
 import (
 	"github.com/cucumber/godog"
+
+	"github.com/wellingtonlope/todo-api/test/helpers"
 )
 
 type TodoCreationContext struct {
@@ -24,7 +26,7 @@ func (tc *TodoCreationContext) ICreateTheTodo() error {
 }
 
 func (tc *TodoCreationContext) TheTodoShouldBeCreatedSuccessfully() error {
-	if err := validateResponseHeaders(tc.Response, StatusCreated); err != nil {
+	if err := validateResponseHeaders(tc.Response, helpers.StatusCreated); err != nil {
 		return err
 	}
 
@@ -32,7 +34,7 @@ func (tc *TodoCreationContext) TheTodoShouldBeCreatedSuccessfully() error {
 }
 
 func (tc *TodoCreationContext) TheCreationShouldFailWithValidationError() error {
-	return validateErrorResponse(tc.Response, StatusBadRequest, "invalid input")
+	return validateErrorResponse(tc.Response, helpers.StatusBadRequest, "invalid input")
 }
 
 func (tc *TodoCreationContext) InitializeScenario(ctx *godog.ScenarioContext) {

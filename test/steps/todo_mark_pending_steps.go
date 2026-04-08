@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/cucumber/godog"
+
+	"github.com/wellingtonlope/todo-api/test/helpers"
 )
 
 type TodoMarkPendingContext struct {
@@ -40,15 +42,15 @@ func (tc *TodoMarkPendingContext) TheTodoShouldBeMarkedAsPendingSuccessfully() e
 }
 
 func (tc *TodoMarkPendingContext) TheMarkingAsPendingShouldFailWithNotFoundError() error {
-	return validateErrorResponse(tc.Response, StatusNotFound, "not found")
+	return validateErrorResponse(tc.Response, helpers.StatusNotFound, "not found")
 }
 
 func (tc *TodoMarkPendingContext) validateMarkPendingResponse() error {
-	if err := validateResponseHeaders(tc.Response, StatusOK); err != nil {
+	if err := validateResponseHeaders(tc.Response, helpers.StatusOK); err != nil {
 		return err
 	}
 
-	var resp TodoResponse
+	var resp helpers.TodoResponse
 	err := json.Unmarshal(tc.Response.Body.Bytes(), &resp)
 	if err != nil {
 		return err
@@ -97,7 +99,7 @@ func (tc *TodoMarkPendingContext) IMarkTheTodoAsPending() error {
 
 // TheMarkPendingShouldFailWithNotFoundError validates 404 error for mark pending
 func (tc *TodoMarkPendingContext) TheMarkPendingShouldFailWithNotFoundError() error {
-	return validateErrorResponse(tc.Response, StatusNotFound, "not found")
+	return validateErrorResponse(tc.Response, helpers.StatusNotFound, "not found")
 }
 
 // TheMarkPendingShouldFailWithValidationError validates 400 error for mark pending

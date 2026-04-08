@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/cucumber/godog"
+
+	"github.com/wellingtonlope/todo-api/test/helpers"
 )
 
 type TodoDeleteByIDContext struct {
@@ -42,7 +44,7 @@ func (tc *TodoDeleteByIDContext) TheTodoShouldBeDeletedSuccessfully() error {
 }
 
 func (tc *TodoDeleteByIDContext) TheDeletionShouldFailWithNotFoundError() error {
-	return validateErrorResponse(tc.Response, StatusNotFound, "not found")
+	return validateErrorResponse(tc.Response, helpers.StatusNotFound, "not found")
 }
 
 func (tc *TodoDeleteByIDContext) InitializeScenario(ctx *godog.ScenarioContext) {

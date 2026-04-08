@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/cucumber/godog"
+
+	"github.com/wellingtonlope/todo-api/test/helpers"
 )
 
 type TodoGetByIDContext struct {
@@ -35,7 +37,7 @@ func (tc *TodoGetByIDContext) IRequestTheTodoWithID(id string) error {
 }
 
 func (tc *TodoGetByIDContext) TheTodoShouldBeRetrievedSuccessfullyWithTitleDescDueDate(title, desc, dueDate string) error {
-	if err := validateResponseHeaders(tc.Response, StatusOK); err != nil {
+	if err := validateResponseHeaders(tc.Response, helpers.StatusOK); err != nil {
 		return err
 	}
 
@@ -43,7 +45,7 @@ func (tc *TodoGetByIDContext) TheTodoShouldBeRetrievedSuccessfullyWithTitleDescD
 }
 
 func (tc *TodoGetByIDContext) TheRetrievalShouldFailWithNotFoundError() error {
-	return validateErrorResponse(tc.Response, StatusNotFound, "not found")
+	return validateErrorResponse(tc.Response, helpers.StatusNotFound, "not found")
 }
 
 func (tc *TodoGetByIDContext) InitializeScenario(ctx *godog.ScenarioContext) {

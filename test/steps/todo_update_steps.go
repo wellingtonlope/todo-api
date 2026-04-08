@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/cucumber/godog"
+
+	"github.com/wellingtonlope/todo-api/test/helpers"
 )
 
 type TodoUpdateContext struct {
@@ -76,12 +78,12 @@ func (tc *TodoUpdateContext) IUpdateTheTodoWithIDFromCreatedTodoWithTitleDescAnd
 }
 
 func (tc *TodoUpdateContext) TheTodoShouldBeUpdatedSuccessfullyWithTitleDescAndDueDate(title, desc, dueDate string) error {
-	if err := validateResponseHeaders(tc.Response, StatusOK); err != nil {
+	if err := validateResponseHeaders(tc.Response, helpers.StatusOK); err != nil {
 		return err
 	}
 
 	// Parse the response to verify the updated todo
-	var resp TodoResponse
+	var resp helpers.TodoResponse
 	err := json.Unmarshal(tc.Response.Body.Bytes(), &resp)
 	if err != nil {
 		return err
@@ -118,11 +120,11 @@ func (tc *TodoUpdateContext) TheTodoShouldBeUpdatedSuccessfullyWithTitleDescAndD
 }
 
 func (tc *TodoUpdateContext) TheUpdateShouldFailWithNotFoundError() error {
-	return validateErrorResponse(tc.Response, StatusNotFound, "not found")
+	return validateErrorResponse(tc.Response, helpers.StatusNotFound, "not found")
 }
 
 func (tc *TodoUpdateContext) TheUpdateShouldFailWithValidationError() error {
-	return validateErrorResponse(tc.Response, StatusBadRequest, "invalid input")
+	return validateErrorResponse(tc.Response, helpers.StatusBadRequest, "invalid input")
 }
 
 func (tc *TodoUpdateContext) InitializeScenario(ctx *godog.ScenarioContext) {
