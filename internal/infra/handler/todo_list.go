@@ -31,6 +31,11 @@ func (h *TodoList) Handle(c echo.Context) error {
 	var status *domain.TodoStatus
 	if statusParam != "" {
 		s := domain.TodoStatus(statusParam)
+		if !s.IsValid() {
+			return c.JSON(http.StatusBadRequest, ErrorResponse{
+				Message: "invalid status: must be 'pending' or 'completed'",
+			})
+		}
 		status = &s
 	}
 

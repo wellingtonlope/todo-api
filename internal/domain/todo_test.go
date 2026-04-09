@@ -307,10 +307,46 @@ func TestTodo_MarkAsPending(t *testing.T) {
 			result: exampleTodoPending,
 		},
 	}
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			result := tc.todo.MarkAsPending(tc.date)
-			assert.Equal(t, tc.result, result)
+			got := tc.todo.MarkAsPending(tc.date)
+			assert.Equal(t, tc.result, got)
+		})
+	}
+}
+
+func TestTodoStatus_IsValid(t *testing.T) {
+	testCases := []struct {
+		name   string
+		status domain.TodoStatus
+		result bool
+	}{
+		{
+			name:   "should return true for pending status",
+			status: domain.TodoStatusPending,
+			result: true,
+		},
+		{
+			name:   "should return true for completed status",
+			status: domain.TodoStatusCompleted,
+			result: true,
+		},
+		{
+			name:   "should return false for invalid status",
+			status: domain.TodoStatus("invalid"),
+			result: false,
+		},
+		{
+			name:   "should return false for empty status",
+			status: domain.TodoStatus(""),
+			result: false,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := tc.status.IsValid()
+			assert.Equal(t, tc.result, got)
 		})
 	}
 }

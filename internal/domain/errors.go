@@ -2,6 +2,4 @@ package domain
 
 import "errors"
 
-var (
-	ErrTodoNotFound = errors.New("todo not found by ID")
-)
+var ErrTodoNotFound = errors.New("todo not found by ID")

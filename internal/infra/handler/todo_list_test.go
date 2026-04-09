@@ -103,6 +103,18 @@ func TestTodoList_Handle(t *testing.T) {
 			responseStatus: http.StatusOK,
 			err:            nil,
 		},
+		{
+			name: "should fail when status is invalid",
+			list: func() *todoListMock {
+				m := new(todoListMock)
+				m.On("Handle", mock.Anything, mock.Anything).Return([]todo.TodoOutput{}, nil).Maybe()
+				return m
+			}(),
+			queryParams:    "?status=invalid",
+			responseBody:   `{"message":"invalid status: must be 'pending' or 'completed'"}`,
+			responseStatus: http.StatusBadRequest,
+			err:            nil,
+		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

@@ -50,3 +50,8 @@ Feature: Todo List
     When I request todos with status "completed"
     Then the response should be successful with status 200
     And the response should contain a list with 2 todos
+
+  Scenario: Get error when filtering by invalid status
+    When I request todos with status "invalid"
+    Then the response should fail with status 400
+    And the response should contain error message "invalid status: must be 'pending' or 'completed'"

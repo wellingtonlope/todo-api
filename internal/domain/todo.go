@@ -3,6 +3,7 @@ package domain
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 )
@@ -19,6 +20,13 @@ const (
 	// TodoStatusCompleted indicates the todo has been completed.
 	TodoStatusCompleted TodoStatus = "completed"
 )
+
+var validStatuses = []TodoStatus{TodoStatusPending, TodoStatusCompleted}
+
+// IsValid checks if the status is a valid TodoStatus.
+func (s TodoStatus) IsValid() bool {
+	return slices.Contains(validStatuses, s)
+}
 
 // Todo represents a task or item to be done.
 type Todo struct {

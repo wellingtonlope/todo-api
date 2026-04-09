@@ -96,6 +96,25 @@ func (tc *TodoListContext) IRequestTodosWithStatus(status string) error {
 	return nil
 }
 
+func (tc *TodoListContext) TheResponseShouldFailWithStatus(status int) error {
+	if err := validateResponseHeaders(tc.Response, status); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (tc *TodoListContext) TheResponseShouldContainErrorMessage(message string) error {
+	var errResp map[string]string
+	err := json.Unmarshal(tc.Response.Body.Bytes(), &errResp)
+	if err != nil {
+		return fmt.Errorf("failed to parse error response: %v", err)
+	}
+	if errResp["message"] != message {
+		return fmt.Errorf("expected error message '%s', got '%s'", message, errResp["message"])
+	}
+	return nil
+}
+
 func (tc *TodoListContext) TheFirstTodoShouldHaveTitleDescDueDate(title, desc, dueDate string) error {
 	return tc.validateTodoAtIndex(0, title, desc, dueDate)
 }
@@ -173,6 +192,8 @@ func (tc *TodoListContext) InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Step(`^I request all todos$`, tc.IRequestAllTodos)
 	ctx.Step(`^I request todos with status "([^"]*)"$`, tc.IRequestTodosWithStatus)
 	ctx.Step(`^the response should be successful with status (\d+)$`, tc.TheResponseShouldBeSuccessfulWithStatus)
+	ctx.Step(`^the response should fail with status (\d+)$`, tc.TheResponseShouldFailWithStatus)
+	ctx.Step(`^the response should contain error message "([^"]*)"$`, tc.TheResponseShouldContainErrorMessage)
 	ctx.Step(`^the response should contain an empty list of todos$`, tc.TheResponseShouldContainAnEmptyListOfTodos)
 	ctx.Step(`^the response should contain a list with (\d+) todos$`, tc.TheResponseShouldContainAListWithTodos)
 	ctx.Step(`^the response should contain a list with (\d+) todo$`, tc.TheResponseShouldContainAListWithTodos)
