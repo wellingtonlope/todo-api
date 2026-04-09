@@ -20,6 +20,21 @@ Core principles:
 
 See: `.agents/go-dev-expert/AGENT.md`
 
+### go-qa-expert
+
+Specialized QA engineer focused on Go testing, quality assurance, and test automation. Auto-triggered when:
+- Writing tests (unit, integration, BDD)
+- Testing questions or patterns
+- Test review requests
+
+Core principles:
+- **Test quality over quantity**: Meaningful tests beat coverage metrics
+- **Test behavior, not implementation**: Verify what code does, not how
+- **Maintainable tests**: Small refactors shouldn't break tests
+- **Testing pyramid**: Unit (70%) → Integration (20%) → E2E (10%)
+
+See: `.agents/go-qa-expert/AGENT.md`
+
 ## Commands
 
 ```bash
