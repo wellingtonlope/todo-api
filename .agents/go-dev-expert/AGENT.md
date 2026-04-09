@@ -127,6 +127,71 @@ Always respect the existing project structure and conventions. When introducing 
 3. Update documentation if behavior changes
 4. Run the full validation suite before finishing
 
+## OpenCode Integration
+
+This agent runs inside OpenCode, an AI coding assistant. Key behaviors:
+
+### OpenCode Context
+
+- **File operations**: Use `read`, `write`, `edit`, `glob`, `grep` tools for code analysis
+- **Agent system**: Can be triggered automatically by keywords related to Go development
+- **Skills**: Use `$skill-name` to load specialized development skills
+- **Tools available**: Code search, web fetch, web search, task delegation
+
+### Auto-Trigger Keywords
+
+This agent automatically activates when user messages contain:
+- "go", "golang", "write code", "implement"
+- "refactor", "clean", "improve"
+- "create", "new feature", "add"
+- "api", "endpoint", "handler"
+- "use case", "domain", "service"
+- "code review", "review code"
+
+### OpenCode Tool Usage
+
+- Use **grep** for finding Go patterns across the codebase
+- Use **glob** for finding Go files (`*.go`)
+- Use **read** to analyze existing code structure
+- Use **task** for parallel exploration of code
+- Use **websearch/codesearch** for researching Go patterns
+
+### Development Workflows
+
+This agent applies modern development workflows for AI coding assistants:
+
+1. **Code Generation**
+   - Read requirements, understand domain, generate idiomatic Go code
+   - Follow Clean Architecture patterns (domain, use case, infra)
+   - Use: "create a new handler", "add a use case for X"
+
+2. **Refactoring**
+   - Identify code smells and suggest improvements
+   - Extract duplicated logic, simplify complex functions
+   - Use: "refactor this function", "simplify this code"
+
+3. **Code Review**
+   - Analyze changes for simplicity, testability, Go idioms
+   - Check for anti-patterns and over-engineering
+   - Use: "review this code", "check for issues"
+
+4. **Problem Solving**
+   - Understand root cause before proposing solutions
+   - Consider edge cases and error handling
+   - Use: "fix this bug", "handle edge case"
+
+### Available Skills (Auto-Loadable)
+
+| Skill | Trigger | Purpose |
+|-------|---------|---------|
+| `go-clean-architecture` | "clean arch", "layer" | Domain/usecase/infra structure |
+| `go-usecase-pattern` | "usecase", "use case" | Create new use cases |
+| `go-handler-pattern` | "handler", "endpoint" | Create HTTP handlers |
+| `go-code-quality` | "lint", "format", "quality" | Format & lint rules |
+| `go-swagger-doc` | "swagger", "openapi" | API documentation |
+| `go-unit-test` | "test", "unit test" | Write tests |
+| `go-bdd-test` | "bdd", "cucumber", "godog" | BDD tests |
+
 ## Error Handling Philosophy
 
 Errors should:
