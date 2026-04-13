@@ -2,10 +2,7 @@ package todo
 
 import (
 	"context"
-	"errors"
-	"fmt"
 
-	"github.com/wellingtonlope/todo-api/internal/app/usecase"
 	"github.com/wellingtonlope/todo-api/internal/domain"
 )
 
@@ -28,12 +25,10 @@ func NewGetByID(store GetByIDStore) *getByID {
 func (uc *getByID) Handle(ctx context.Context, id string) (TodoOutput, error) {
 	todo, err := uc.store.GetByID(ctx, id)
 	if err != nil {
-		if errors.Is(err, domain.ErrTodoNotFound) {
-			return TodoOutput{}, usecase.NewError(fmt.Sprintf("todo not found with id %s", id),
-				err, usecase.ErrorTypeNotFound)
+		if isNotFound(err) {
+			return TodoOutput{}, notFoundError(id, err)
 		}
-		return TodoOutput{}, usecase.NewError("fail to get a todo by id",
-			err, usecase.ErrorTypeInternalError)
+		return TodoOutput{}, internalError("fail to get a todo by id", err)
 	}
 	return TodoOutputFromDomain(todo), nil
 }

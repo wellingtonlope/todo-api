@@ -2,11 +2,6 @@ package todo
 
 import (
 	"context"
-	"errors"
-	"fmt"
-
-	"github.com/wellingtonlope/todo-api/internal/app/usecase"
-	"github.com/wellingtonlope/todo-api/internal/domain"
 )
 
 type (
@@ -28,12 +23,10 @@ func NewDeleteByID(store DeleteByIDStore) *deleteByID {
 func (uc *deleteByID) Handle(ctx context.Context, id string) error {
 	err := uc.store.DeleteByID(ctx, id)
 	if err != nil {
-		if errors.Is(err, domain.ErrTodoNotFound) {
-			return usecase.NewError(fmt.Sprintf("todo not found with id %s", id),
-				err, usecase.ErrorTypeNotFound)
+		if isNotFound(err) {
+			return notFoundError(id, err)
 		}
-		return usecase.NewError("fail to delete a todo by id", err,
-			usecase.ErrorTypeInternalError)
+		return internalError("fail to delete a todo by id", err)
 	}
 	return nil
 }

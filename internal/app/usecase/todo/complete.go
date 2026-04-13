@@ -2,11 +2,8 @@ package todo
 
 import (
 	"context"
-	"errors"
-	"fmt"
 
 	"github.com/wellingtonlope/todo-api/internal/app/usecase"
-	"github.com/wellingtonlope/todo-api/internal/domain"
 )
 
 type (
@@ -33,22 +30,18 @@ func NewComplete(store CompleteStore, clock usecase.Clock) *complete {
 func (uc *complete) Handle(ctx context.Context, input CompleteInput) (TodoOutput, error) {
 	todo, err := uc.store.GetByID(ctx, input.ID)
 	if err != nil {
-		if errors.Is(err, domain.ErrTodoNotFound) {
-			return TodoOutput{}, usecase.NewError(fmt.Sprintf("todo not found with id %s", input.ID),
-				err, usecase.ErrorTypeNotFound)
+		if isNotFound(err) {
+			return TodoOutput{}, notFoundError(input.ID, err)
 		}
-		return TodoOutput{}, usecase.NewError("fail to get a todo by id",
-			err, usecase.ErrorTypeInternalError)
+		return TodoOutput{}, internalError("fail to get a todo by id", err)
 	}
 	todo = todo.MarkAsCompleted(uc.clock.Now())
 	todo, err = uc.store.Update(ctx, todo)
 	if err != nil {
-		if errors.Is(err, domain.ErrTodoNotFound) {
-			return TodoOutput{}, usecase.NewError(fmt.Sprintf("todo not found with id %s", input.ID),
-				err, usecase.ErrorTypeNotFound)
+		if isNotFound(err) {
+			return TodoOutput{}, notFoundError(input.ID, err)
 		}
-		return TodoOutput{}, usecase.NewError("fail to update a todo in the store", err,
-			usecase.ErrorTypeInternalError)
+		return TodoOutput{}, internalError("fail to update a todo in the store", err)
 	}
 	return TodoOutputFromDomain(todo), nil
 }
